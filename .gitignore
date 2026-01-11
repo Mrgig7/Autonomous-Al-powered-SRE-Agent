@@ -76,3 +76,34 @@ docker-compose.override.yml
 # Local development
 .local/
 *.log
+
+# ==================================
+# FRONTEND (Node.js / React / Vite)
+# ==================================
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build outputs
+frontend/dist/
+frontend/build/
+
+# Vite
+frontend/.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# npm/pnpm/yarn
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+package-lock.json
+pnpm-lock.yaml
+
+# Editor directories and files
+.DS_Store
+Thumbs.db

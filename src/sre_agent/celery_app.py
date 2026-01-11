@@ -10,7 +10,11 @@ celery_app = Celery(
     "sre_agent",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["sre_agent.tasks.dispatch", "sre_agent.tasks.context_tasks"],
+    include=[
+        "sre_agent.tasks.dispatch",
+        "sre_agent.tasks.context_tasks",
+        "sre_agent.tasks.notification_tasks",
+    ],
 )
 
 # Celery configuration

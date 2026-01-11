@@ -62,6 +62,79 @@ class Settings(BaseSettings):
     sandbox_cpu_limit: float = 1.0
     sandbox_network_enabled: bool = False
 
+    # ============================================
+    # NOTIFICATION CONFIGURATION
+    # ============================================
+    
+    # Slack Integration
+    slack_enabled: bool = False
+    slack_webhook_url: str = ""
+    slack_bot_token: str = ""
+    slack_signing_secret: str = ""
+    slack_default_channel: str = "#sre-alerts"
+    slack_critical_channel: str = "#sre-critical"
+    slack_approval_channel: str = "#sre-approvals"
+    
+    # Microsoft Teams Integration
+    teams_enabled: bool = False
+    teams_webhook_url: str = ""
+    
+    # Email Integration
+    email_enabled: bool = False
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    smtp_from_address: str = "sre-agent@company.com"
+    smtp_from_name: str = "SRE Agent"
+    email_default_recipients: str = ""  # Comma-separated
+    email_critical_recipients: str = ""  # Comma-separated
+    sendgrid_api_key: str = ""
+    
+    # PagerDuty Integration
+    pagerduty_enabled: bool = False
+    pagerduty_routing_key: str = ""
+    pagerduty_api_key: str = ""
+    pagerduty_auto_resolve: bool = True
+    
+    # Generic Webhook
+    webhook_enabled: bool = False
+    webhook_url: str = ""
+    webhook_auth_type: str = ""  # "bearer", "basic", "hmac"
+    webhook_auth_token: str = ""
+    webhook_hmac_secret: str = ""
+    
+    # Notification Manager Settings
+    notification_parallel_dispatch: bool = True
+    notification_rate_limit_enabled: bool = True
+    notification_rate_limit_per_minute: int = 30
+    notification_min_level: str = "info"  # debug, info, warning, error, critical
+
+    # ============================================
+    # AUTHENTICATION CONFIGURATION
+    # ============================================
+    
+    # JWT Settings
+    jwt_secret_key: str = "change-this-to-a-secure-secret-key-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
+    jwt_refresh_token_expire_days: int = 7
+    
+    # GitHub OAuth
+    github_oauth_client_id: str = ""
+    github_oauth_client_secret: str = ""
+    github_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/oauth/github/callback"
+    
+    # Google OAuth
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/oauth/google/callback"
+    
+    # Session Settings
+    session_max_age_hours: int = 24
+    require_email_verification: bool = False
+
     @property
     def is_production(self) -> bool:
         """Check if running in production mode."""

@@ -13,10 +13,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from sre_agent import __version__
+from sre_agent.api.auth import router as auth_router
+from sre_agent.api.dashboard import router as dashboard_router
 from sre_agent.api.health import router as health_router
+from sre_agent.api.notifications import router as notifications_router
+from sre_agent.api.users import router as users_router
 from sre_agent.api.webhooks.github import router as github_router
 from sre_agent.config import get_settings
 from sre_agent.core.logging import setup_logging
+from sre_agent.core.redis_service import init_redis, shutdown_redis
+from sre_agent.database import close_database
+from sre_agent.notifications.factory import (
+    get_notification_manager,
+    shutdown_notification_manager,
+)
+from sre_agent.services.audit_service import init_audit_service, shutdown_audit_service
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +45,32 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             "environment": settings.environment,
         },
     )
+    
+    # Initialize Redis for caching and rate limiting
+    await init_redis()
+    logger.info("Redis service initialized")
+    
+    # Initialize audit service
+    await init_audit_service()
+    logger.info("Audit service initialized")
+    
+    # Initialize notification manager
+    notification_manager = get_notification_manager(settings)
+    notifier_count = len(notification_manager.list_notifiers())
+    logger.info(
+        f"Notification system initialized with {notifier_count} channels",
+        extra={"channels": notification_manager.list_notifiers()},
+    )
 
     yield
 
     # Shutdown
     logger.info("SRE Agent shutting down")
+    await shutdown_audit_service()
+    await shutdown_notification_manager()
+    await shutdown_redis()
+    await close_database()
+    logger.info("SRE Agent shutdown complete")
 
 
 def create_app() -> FastAPI:
@@ -88,6 +120,10 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health_router)
     app.include_router(github_router)
+    app.include_router(auth_router, prefix=settings.api_prefix)
+    app.include_router(notifications_router, prefix=settings.api_prefix)
+    app.include_router(users_router, prefix=settings.api_prefix)
+    app.include_router(dashboard_router, prefix=settings.api_prefix)
 
     # Root endpoint
     @app.get("/")

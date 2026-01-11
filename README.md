@@ -1,6 +1,12 @@
 <p align="center">
+  <img src="https://img.shields.io/badge/Status-In%20Development-orange?style=for-the-badge" alt="Status">
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white" alt="Celery">
   <img src="https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
@@ -14,12 +20,23 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/🚧-Under%20Active%20Development-yellow?style=flat-square" alt="Development Status">
+</p>
+
+<p align="center">
   <a href="#-features">Features</a> •
+  <a href="#-whats-new">What's New</a> •
   <a href="#-architecture">Architecture</a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-api-reference">API</a> •
   <a href="#-contributing">Contributing</a>
 </p>
+
+---
+
+## 🚧 Project Status
+
+> ⚠️ **This project is currently under active development.** Features may be incomplete or subject to change. Contributions and feedback are welcome!
 
 ---
 
@@ -37,7 +54,41 @@ The **Autonomous AI-powered SRE Agent** is a cutting-edge platform that revoluti
 
 ---
 
-## ✨ Features
+## 🆕 What's New
+
+### 🖥️ React Dashboard (NEW!)
+- Modern React 18 + TypeScript frontend
+- Real-time system overview and metrics
+- Interactive event monitoring and management
+- Responsive design with dark mode support
+
+### 🔐 User Authentication & Authorization (NEW!)
+- JWT-based secure authentication
+- User registration and login system
+- Role-based access control (RBAC)
+- Session management with Redis
+
+### 🔔 Real-time Notifications (NEW!)
+- Server-Sent Events (SSE) for instant updates
+- In-app notification center
+- Configurable alert preferences
+- Push notification support
+
+### 📊 Dashboard API (NEW!)
+- System health metrics endpoint
+- Event statistics and analytics
+- User management interface
+- Real-time data streaming
+
+### 📝 Audit Logging (NEW!)
+- Comprehensive activity tracking
+- User action history
+- Security event monitoring
+- Compliance-ready logging
+
+---
+
+## ✨ Core Features
 
 ### 🎯 Intelligent Failure Detection
 - Real-time GitHub webhook integration
@@ -253,15 +304,28 @@ poetry run pytest tests/test_api.py -v
 
 ## 🗺️ Roadmap
 
+### ✅ Completed
 - [x] 🏗️ Project foundation & architecture
 - [x] 📡 Event ingestion API
 - [x] 🧠 AI fix generation engine
 - [x] 🏖️ Sandbox validation engine
 - [x] 📋 PR creation service
+- [x] 🌐 React Dashboard (Web UI)
+- [x] 🔐 User Authentication & Authorization
+- [x] 🔔 Real-time Notifications (SSE)
+- [x] 📊 Dashboard API & Analytics
+- [x] 📝 Audit Logging System
+
+### 🚧 In Progress
 - [ ] 🔄 Multi-CI/CD platform support (CircleCI, GitLab)
-- [ ] 📊 Analytics dashboard
-- [ ] 🔐 Enhanced security & audit logs
-- [ ] 🌐 Web UI for monitoring
+- [ ] � Advanced Analytics & Reporting
+- [ ] � Enhanced Security Features
+
+### 🔮 Planned
+- [ ] 📱 Mobile-responsive PWA
+- [ ] 🤖 AI Model Fine-tuning
+- [ ] � Multi-region Deployment Support
+- [ ] 📊 Custom Dashboard Widgets
 
 ---
 
