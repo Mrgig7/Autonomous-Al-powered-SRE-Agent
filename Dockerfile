@@ -3,39 +3,53 @@ FROM python:3.11-slim as builder
 
 WORKDIR /app
 
-# Install poetry
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
 RUN pip install poetry==1.7.1
 
 # Copy dependency files
 COPY pyproject.toml poetry.lock* ./
 
-# Export requirements (without dev dependencies)
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --only main
 
-# Runtime stage
-FROM python:3.11-slim as runtime
+# Production stage
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Create non-root user
-RUN groupadd -r sre_agent && useradd -r -g sre_agent sre_agent
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-COPY --from=builder /app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src/ ./src/
 COPY alembic/ ./alembic/
-COPY alembic.ini .
+COPY alembic.ini ./
 
-# Set PYTHONPATH
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+# Environment variables
 ENV PYTHONPATH=/app/src
+ENV PYTHONUNBUFFERED=1
 
-# Change ownership to non-root user
-RUN chown -R sre_agent:sre_agent /app
-
-USER sre_agent
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # Expose port
 EXPOSE 8000

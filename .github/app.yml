@@ -1,0 +1,52 @@
+# GitHub App Manifest
+# Use this to create your own SRE Agent GitHub App instance
+# See: https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest
+
+name: SRE Agent
+description: |
+  Autonomous AI-powered SRE Agent for self-healing CI/CD pipelines.
+  Automatically detects failures, analyzes root causes, and suggests fixes.
+
+url: https://github.com/Mrgig7/Autonomous-AI-powered-SRE-Agent
+hook_url: https://your-server.com/webhooks/github
+
+# Redirect URL after installation
+setup_url: https://your-server.com/setup
+redirect_url: https://your-server.com/auth/github/callback
+
+# Request OAuth during installation
+setup_on_update: true
+
+# Webhook configuration
+webhook:
+  active: true
+  url: https://your-server.com/webhooks/github
+
+# Permissions required
+default_permissions:
+  # Repository permissions
+  actions: read           # Read workflow runs
+  checks: write           # Create check runs
+  contents: read          # Read repository files
+  issues: write           # Create issues for failures
+  metadata: read          # Basic repository info
+  pull_requests: write    # Create fix PRs
+  statuses: write         # Update commit statuses
+  workflows: read         # Read workflow files
+  
+  # Organization permissions (optional)
+  members: read           # For team notifications
+  
+default_events:
+  - check_run
+  - check_suite
+  - workflow_job
+  - workflow_run
+  - push
+  - pull_request
+
+# Can be installed on user accounts
+public: true
+
+# Single instance or multiple per organization
+single_file_name: null

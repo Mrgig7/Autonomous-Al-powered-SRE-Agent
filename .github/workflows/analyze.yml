@@ -1,0 +1,68 @@
+name: SRE Agent - Analyze Failed Workflows
+
+on:
+  workflow_run:
+    workflows: ["*"]  # Trigger on any workflow
+    types:
+      - completed
+
+jobs:
+  analyze-failure:
+    name: Analyze CI Failure
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run SRE Agent Analysis
+        uses: Mrgig7/Autonomous-AI-powered-SRE-Agent@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          notify-slack: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          auto-create-pr: false
+      
+      - name: Comment on commit
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read the analysis report
+            let report = {};
+            try {
+              report = JSON.parse(fs.readFileSync('report.json', 'utf8'));
+            } catch (e) {
+              console.log('No report found');
+              return;
+            }
+            
+            if (!report.failure_detected) return;
+            
+            // Create comment on the failing commit
+            const sha = context.payload.workflow_run.head_sha;
+            
+            const body = `## 🔧 SRE Agent Analysis
+            
+**Workflow:** ${context.payload.workflow_run.name}
+**Status:** ❌ Failed
+**Branch:** ${context.payload.workflow_run.head_branch}
+
+### Failure Summary
+${report.summary || 'Analysis complete. See report for details.'}
+
+### Suggested Fix
+${report.fix_suggestion || 'No automated fix available.'}
+
+---
+*Analyzed by [SRE Agent](https://github.com/Mrgig7/Autonomous-AI-powered-SRE-Agent)*`;
+            
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: sha,
+              body: body
+            });

@@ -1,29 +1,33 @@
-version: "3.9"
+version: "3.8"
+
+# SRE Agent - Quick Start Docker Compose
+# Usage: docker-compose up -d
+# Dashboard: http://localhost:8000
+# Docs: http://localhost:8000/docs
 
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: sre_agent_postgres
+    container_name: sre-agent-db
     environment:
       POSTGRES_USER: sre_agent
       POSTGRES_PASSWORD: sre_agent_password
       POSTGRES_DB: sre_agent
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sre_agent -d sre_agent"]
+      test: ["CMD-SHELL", "pg_isready -U sre_agent"]
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
-  # Redis (Celery Broker)
+  # Redis (Celery broker + caching)
   redis:
     image: redis:7-alpine
-    container_name: sre_agent_redis
+    container_name: sre-agent-redis
     ports:
       - "6379:6379"
     volumes:
@@ -33,51 +37,96 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
-  # FastAPI Application
+  # SRE Agent API
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sre_agent_api
+    container_name: sre-agent-api
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://sre_agent:sre_agent_password@postgres:5432/sre_agent
       - REDIS_URL=redis://redis:6379/0
-      - LOG_LEVEL=INFO
       - ENVIRONMENT=dev
-    env_file:
-      - .env
+      - LOG_LEVEL=INFO
+      # GitHub Integration
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      # LLM Configuration
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-deepseek-coder:6.7b}
+      # Notifications (optional)
+      - SLACK_ENABLED=${SLACK_ENABLED:-false}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Celery Worker
+  # Celery Worker (background tasks)
   worker:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sre_agent_worker
-    command: celery -A sre_agent.celery_app worker --loglevel=info
+    container_name: sre-agent-worker
+    command: celery -A sre_agent.tasks.celery_app worker --loglevel=info
     environment:
       - DATABASE_URL=postgresql+asyncpg://sre_agent:sre_agent_password@postgres:5432/sre_agent
       - REDIS_URL=redis://redis:6379/0
-      - LOG_LEVEL=INFO
-      - ENVIRONMENT=dev
-    env_file:
-      - .env
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+      - api
+      - redis
+
+  # Ollama (Local LLM - optional)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sre-agent-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    profiles:
+      - local-llm  # Only starts with: docker-compose --profile local-llm up
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sre-agent-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    profiles:
+      - with-frontend
 
 volumes:
   postgres_data:
   redis_data:
+  ollama_data:
+
+networks:
+  default:
+    name: sre-agent-network

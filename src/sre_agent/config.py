@@ -135,6 +135,37 @@ class Settings(BaseSettings):
     session_max_age_hours: int = 24
     require_email_verification: bool = False
 
+    # ============================================
+    # CI/CD PROVIDER CONFIGURATION (Phase 2)
+    # ============================================
+    
+    # Enabled providers (comma-separated)
+    enabled_ci_providers: str = "github"
+    
+    # GitLab Integration
+    gitlab_enabled: bool = False
+    gitlab_url: str = "https://gitlab.com"
+    gitlab_token: str = ""
+    gitlab_webhook_token: str = ""
+    
+    # CircleCI Integration
+    circleci_enabled: bool = False
+    circleci_token: str = ""
+    circleci_webhook_secret: str = ""
+    
+    # Jenkins Integration
+    jenkins_enabled: bool = False
+    jenkins_url: str = ""
+    jenkins_user: str = ""
+    jenkins_token: str = ""
+    jenkins_webhook_token: str = ""
+    
+    # Azure DevOps Integration
+    azure_devops_enabled: bool = False
+    azure_devops_org: str = ""
+    azure_devops_pat: str = ""
+    azure_devops_webhook_secret: str = ""
+
     @property
     def is_production(self) -> bool:
         """Check if running in production mode."""

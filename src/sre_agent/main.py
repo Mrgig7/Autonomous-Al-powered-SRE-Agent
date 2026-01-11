@@ -19,6 +19,10 @@ from sre_agent.api.health import router as health_router
 from sre_agent.api.notifications import router as notifications_router
 from sre_agent.api.users import router as users_router
 from sre_agent.api.webhooks.github import router as github_router
+from sre_agent.api.webhooks.gitlab import router as gitlab_router
+from sre_agent.api.webhooks.circleci import router as circleci_router
+from sre_agent.api.webhooks.jenkins import router as jenkins_router
+from sre_agent.api.webhooks.azuredevops import router as azuredevops_router
 from sre_agent.config import get_settings
 from sre_agent.core.logging import setup_logging
 from sre_agent.core.redis_service import init_redis, shutdown_redis
@@ -28,6 +32,7 @@ from sre_agent.notifications.factory import (
     shutdown_notification_manager,
 )
 from sre_agent.services.audit_service import init_audit_service, shutdown_audit_service
+from sre_agent.providers import register_all_providers
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +125,10 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health_router)
     app.include_router(github_router)
+    app.include_router(gitlab_router)
+    app.include_router(circleci_router)
+    app.include_router(jenkins_router)
+    app.include_router(azuredevops_router)
     app.include_router(auth_router, prefix=settings.api_prefix)
     app.include_router(notifications_router, prefix=settings.api_prefix)
     app.include_router(users_router, prefix=settings.api_prefix)

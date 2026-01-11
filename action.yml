@@ -1,0 +1,135 @@
+name: SRE Agent - Failure Analysis
+description: Autonomous AI-powered CI/CD failure detection, analysis, and fix generation
+author: Mrgig7
+
+branding:
+  icon: 'shield'
+  color: 'purple'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  
+  sre-agent-url:
+    description: 'SRE Agent API URL (for self-hosted)'
+    required: false
+    default: ''
+  
+  notify-slack:
+    description: 'Send notifications to Slack'
+    required: false
+    default: 'false'
+  
+  slack-webhook-url:
+    description: 'Slack webhook URL for notifications'
+    required: false
+    default: ''
+  
+  auto-create-pr:
+    description: 'Automatically create PR with suggested fix'
+    required: false
+    default: 'false'
+  
+  llm-provider:
+    description: 'LLM provider for fix generation (ollama, openai)'
+    required: false
+    default: 'ollama'
+
+outputs:
+  failure-detected:
+    description: 'Whether a failure was detected'
+    value: ${{ steps.analyze.outputs.failure-detected }}
+  
+  fix-generated:
+    description: 'Whether a fix was generated'
+    value: ${{ steps.analyze.outputs.fix-generated }}
+  
+  fix-pr-url:
+    description: 'URL of the fix PR (if created)'
+    value: ${{ steps.analyze.outputs.fix-pr-url }}
+  
+  analysis-report:
+    description: 'Path to the analysis report'
+    value: ${{ steps.analyze.outputs.report-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install SRE Agent CLI
+      shell: bash
+      run: |
+        pip install sre-agent-cli || pip install git+https://github.com/Mrgig7/Autonomous-AI-powered-SRE-Agent.git#subdirectory=cli
+    
+    - name: Analyze workflow failure
+      id: analyze
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        SRE_AGENT_URL: ${{ inputs.sre-agent-url }}
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+        LLM_PROVIDER: ${{ inputs.llm-provider }}
+      run: |
+        # Get failed workflow run details
+        WORKFLOW_RUN_ID="${{ github.run_id }}"
+        REPO="${{ github.repository }}"
+        
+        echo "🔍 Analyzing workflow run: $WORKFLOW_RUN_ID"
+        
+        # Run SRE Agent analysis
+        sre-agent analyze \
+          --repo "$REPO" \
+          --run-id "$WORKFLOW_RUN_ID" \
+          --output report.json \
+          ${SRE_AGENT_URL:+--api-url "$SRE_AGENT_URL"} \
+          ${SLACK_WEBHOOK_URL:+--slack-webhook "$SLACK_WEBHOOK_URL"}
+        
+        # Parse results
+        if [ -f report.json ]; then
+          FAILURE_DETECTED=$(jq -r '.failure_detected // false' report.json)
+          FIX_GENERATED=$(jq -r '.fix_generated // false' report.json)
+          
+          echo "failure-detected=$FAILURE_DETECTED" >> $GITHUB_OUTPUT
+          echo "fix-generated=$FIX_GENERATED" >> $GITHUB_OUTPUT
+          echo "report-path=report.json" >> $GITHUB_OUTPUT
+          
+          if [ "$FAILURE_DETECTED" = "true" ]; then
+            echo "⚠️ Failure detected in workflow"
+            cat report.json | jq '.summary'
+          fi
+        else
+          echo "failure-detected=false" >> $GITHUB_OUTPUT
+          echo "fix-generated=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Fix PR
+      if: ${{ inputs.auto-create-pr == 'true' && steps.analyze.outputs.fix-generated == 'true' }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        sre-agent create-pr \
+          --repo "${{ github.repository }}" \
+          --report report.json \
+          --base "${{ github.ref_name }}"
+        
+        echo "fix-pr-url=$(cat pr_url.txt)" >> $GITHUB_OUTPUT
+    
+    - name: Upload analysis report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: sre-agent-report
+        path: report.json
+        retention-days: 30
