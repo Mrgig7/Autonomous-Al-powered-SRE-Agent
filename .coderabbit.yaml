@@ -1,0 +1,23 @@
+# CodeRabbit Configuration
+# See: https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: "en-US"
+
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_filters: []
+  path_instructions: []
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["main", "develop"]
+
+chat:
+  auto_reply: true
