@@ -1,17 +1,14 @@
 """Test configuration and fixtures."""
+
 import asyncio
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import Generator
 from typing import Any
 from unittest.mock import MagicMock
-from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-from sre_agent.main import app
-from sre_agent.models.events import Base
-
+from sre_agent.config import get_settings
+from sre_agent.main import create_app
 
 # Use in-memory SQLite for tests (requires aiosqlite)
 # For full PostgreSQL tests, use testcontainers
@@ -27,8 +24,12 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 
 @pytest.fixture
-def client() -> Generator[TestClient, None, None]:
+def client(monkeypatch: pytest.MonkeyPatch) -> Generator[TestClient, None, None]:
     """Create test client for API tests."""
+    monkeypatch.delenv("GITHUB_WEBHOOK_SECRET", raising=False)
+    monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", "")
+    get_settings.cache_clear()
+    app = create_app()
     with TestClient(app) as c:
         yield c
 

@@ -1,9 +1,22 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-In%20Development-orange?style=for-the-badge" alt="Status">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=40&duration=3000&pause=1000&color=00D9FF&center=true&vCenter=true&multiline=true&repeat=false&width=800&height=100&lines=%F0%9F%A4%96+Autonomous+AI-powered+SRE+Agent" alt="Typing SVG" />
+</p>
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=2000&pause=500&color=A855F7&center=true&vCenter=true&width=700&lines=Self-Healing+CI%2FCD+Platform;Detects+Failures+in+Real-Time;AI-Powered+Root+Cause+Analysis;Auto-Generates+Safe+Code+Fixes;Creates+Pull+Requests+Automatically" alt="Typing SVG" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/🚧_STATUS-UNDER_DEVELOPMENT-orange?style=for-the-badge&labelColor=1a1a2e" alt="Status">
+  <img src="https://img.shields.io/github/license/Mrgig7/Autonomous-Al-powered-SRE-Agent?style=for-the-badge&labelColor=1a1a2e&color=00d9ff" alt="License">
+  <img src="https://img.shields.io/github/last-commit/Mrgig7/Autonomous-Al-powered-SRE-Agent?style=for-the-badge&labelColor=1a1a2e&color=a855f7" alt="Last Commit">
+</p>
+
+<p align="center">
+  <a href="#-features"><img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
+  <a href="#-architecture"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"></a>
+  <a href="#-features"><img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"></a>
+  <a href="#-features"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"></a>
 </p>
 
 <p align="center">
@@ -13,159 +26,433 @@
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
 </p>
 
-<h1 align="center">🤖 Autonomous AI-powered SRE Agent</h1>
+<br>
 
-<p align="center">
-  <strong>Self-Healing CI/CD Platform that detects failures, diagnoses root causes, and auto-generates safe fixes</strong>
-</p>
+<div align="center">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/🚧-Under%20Active%20Development-yellow?style=flat-square" alt="Development Status">
-</p>
+  **🚧 This project is actively under development. Features may change. Contributions welcome!**
 
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-whats-new">What's New</a> •
-  <a href="#-architecture">Architecture</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-api-reference">API</a> •
-  <a href="#-contributing">Contributing</a>
-</p>
+</div>
+
+<br>
 
 ---
 
-## 🚧 Project Status
+<br>
 
-> ⚠️ **This project is currently under active development.** Features may be incomplete or subject to change. Contributions and feedback are welcome!
+## 📋 Table of Contents
+
+<details>
+<summary>Click to expand</summary>
+
+- [🌟 Overview](#-overview)
+- [✨ Key Features](#-key-features)
+- [🆕 What's New](#-whats-new)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [🔌 API Reference](#-api-reference)
+- [⚙️ Configuration](#️-configuration)
+- [🧪 Testing](#-testing)
+- [📁 Project Structure](#-project-structure)
+- [🗺️ Roadmap](#️-roadmap)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
+</details>
+
+<br>
 
 ---
+
+<br>
 
 ## 🌟 Overview
 
-The **Autonomous AI-powered SRE Agent** is a cutting-edge platform that revolutionizes how engineering teams handle CI/CD failures. Instead of manually debugging build failures, our AI agent:
+<div align="center">
 
-- 🔍 **Detects** CI/CD failures in real-time via GitHub webhooks
-- 🧠 **Diagnoses** root causes using AI-powered analysis
-- 🔧 **Generates** safe, context-aware code fixes using LLMs
-- ✅ **Validates** fixes in isolated sandbox environments
-- 🚀 **Creates** Pull Requests with detailed explanations
+### **No more 3 AM debugging sessions. Let the AI agent fix your builds while you sleep.**
 
-> **No more 3 AM debugging sessions. Let the AI agent fix your builds while you sleep.**
+</div>
+
+<br>
+
+The **Autonomous AI-powered SRE Agent** is a cutting-edge platform that revolutionizes how engineering teams handle CI/CD failures. Our intelligent agent transforms the way you manage build failures:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🎯 The Problem
+
+- ⏰ Hours spent debugging CI/CD failures
+- 🔄 Repetitive manual fixes for similar issues
+- 😴 Late-night on-call pages
+- 📉 Developer productivity drain
+- 🔍 Root cause analysis is time-consuming
+
+</td>
+<td width="50%" valign="top">
+
+### ✅ Our Solution
+
+- 🔍 **Detects** failures in real-time via webhooks
+- 🧠 **Diagnoses** root causes with AI
+- 🔧 **Generates** safe, context-aware fixes
+- ✅ **Validates** in isolated sandboxes
+- 🚀 **Creates** detailed Pull Requests
+
+</td>
+</tr>
+</table>
+
+<br>
 
 ---
+
+<br>
+
+## ✨ Key Features
+
+<br>
+
+<table>
+<tr>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/webhook.png" width="60"/>
+<br><br>
+<b>🎯 Intelligent Detection</b>
+<br><br>
+Real-time GitHub/GitLab webhooks with multi-runner support (GitHub Actions, CircleCI, Jenkins)
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/artificial-intelligence.png" width="60"/>
+<br><br>
+<b>🧠 AI-Powered RCA</b>
+<br><br>
+Semantic log analysis with ML models and pattern matching against known failure signatures
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/code.png" width="60"/>
+<br><br>
+<b>🛠️ Autonomous Fixes</b>
+<br><br>
+LLM-powered code generation with multi-file support and line-level precision
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/sandbox.png" width="60"/>
+<br><br>
+<b>🏖️ Sandbox Validation</b>
+<br><br>
+Isolated Docker environments for safe fix testing with rollback-safe architecture
+</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/pull-request.png" width="60"/>
+<br><br>
+<b>📋 Smart PR Management</b>
+<br><br>
+Auto-generated PRs with detailed changelogs and confidence scores
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/shield.png" width="60"/>
+<br><br>
+<b>🔐 Enterprise Security</b>
+<br><br>
+JWT auth, RBAC, session management, and comprehensive audit logging
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/dashboard.png" width="60"/>
+<br><br>
+<b>📊 Modern Dashboard</b>
+<br><br>
+React 18 + TypeScript with real-time metrics and dark mode support
+</td>
+<td align="center" width="25%">
+<img src="https://img.icons8.com/fluency/96/000000/combo-chart.png" width="60"/>
+<br><br>
+<b>📈 Full Observability</b>
+<br><br>
+Prometheus, Grafana, OpenTelemetry tracing, and Tempo integration
+</td>
+</tr>
+</table>
+
+<br>
+
+---
+
+<br>
 
 ## 🆕 What's New
 
-### 🖥️ React Dashboard (NEW!)
-- Modern React 18 + TypeScript frontend
-- Real-time system overview and metrics
-- Interactive event monitoring and management
-- Responsive design with dark mode support
+<br>
 
-### 🔐 User Authentication & Authorization (NEW!)
-- JWT-based secure authentication
-- User registration and login system
-- Role-based access control (RBAC)
-- Session management with Redis
+<table>
+<tr>
+<td>
 
-### 🔔 Real-time Notifications (NEW!)
-- Server-Sent Events (SSE) for instant updates
-- In-app notification center
-- Configurable alert preferences
-- Push notification support
+### 🧾 Explainability + Trust Dashboard
+**Evidence-based failure analysis with full transparency**
 
-### 📊 Dashboard API (NEW!)
-- System health metrics endpoint
-- Event statistics and analytics
-- User management interface
-- Real-time data streaming
+- ✅ Root cause + log evidence with line indices
+- ✅ Patch preview (unified diff) + FixPlan JSON preview
+- ✅ Danger score breakdown + policy violations surfaced
+- ✅ Scan summaries (gitleaks/trivy/sbom + sandbox status)
+- ✅ Provenance artifact viewer + pipeline timeline
 
-### 📝 Audit Logging (NEW!)
-- Comprehensive activity tracking
-- User action history
-- Security event monitoring
-- Compliance-ready logging
+</td>
+<td>
+
+### 📊 Observability Stack
+**Complete monitoring and tracing infrastructure**
+
+- ✅ Prometheus metrics at `/metrics`
+- ✅ Grafana dashboards + provisioning
+- ✅ OpenTelemetry tracing via OTLP
+- ✅ Local collector + Tempo integration
+- 📖 [Docs: observability.md](docs/observability.md)
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🖥️ React Dashboard
+**Modern, responsive web interface**
+
+- ✅ React 18 + TypeScript + Vite
+- ✅ Real-time system overview and metrics
+- ✅ Interactive event monitoring
+- ✅ Dark mode support
+- ✅ Responsive design
+
+</td>
+<td>
+
+### 🔐 Authentication & Authorization
+**Enterprise-grade security**
+
+- ✅ JWT-based secure authentication
+- ✅ User registration and login system
+- ✅ Role-based access control (RBAC)
+- ✅ Session management with Redis
+- ✅ Comprehensive audit logging
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🔔 Real-time Notifications
+**Instant updates when you need them**
+
+- ✅ Server-Sent Events (SSE)
+- ✅ In-app notification center
+- ✅ Configurable alert preferences
+- ✅ Push notification support
+
+</td>
+<td>
+
+### 🌍 Multi-Language Support
+**Not just Python - works with your stack**
+
+- ✅ Node.js (npm/yarn)
+- ✅ Go (go.mod/go.sum)
+- ✅ Java (Maven/Gradle)
+- ✅ Docker (Dockerfile)
+- ✅ Python (pip/poetry)
+
+</td>
+</tr>
+</table>
+
+<br>
 
 ---
 
-## ✨ Core Features
-
-### 🎯 Intelligent Failure Detection
-- Real-time GitHub webhook integration
-- Automatic failure event ingestion
-- Multi-runner support (GitHub Actions, CircleCI, Jenkins)
-
-### 🧪 AI-Powered Root Cause Analysis
-- Semantic log analysis with ML models
-- Pattern matching against known failure signatures
-- Contextual understanding of build configurations
-
-### 🛠️ Autonomous Fix Generation
-- LLM-powered code fix suggestions
-- Multi-file fix support with line-level precision
-- Safe, reversible modifications only
-
-### 🏖️ Sandbox Validation
-- Isolated Docker environments for fix testing
-- Automated test execution pre-merge
-- Rollback-safe architecture
-
-### 📋 Smart PR Management
-- Auto-generated PRs with detailed changelogs
-- Confidence scores for each fix
-- One-click approval or rejection
-
----
+<br>
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  GitHub/CI/CD   │────▶│  Event Ingestion │────▶│  Failure Store  │
-│    Webhooks     │     │       API        │     │   (PostgreSQL)  │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                                                          │
-                                                          ▼
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   PR Creation   │◀────│   AI Fix Engine  │◀────│  Intelligence   │
-│    Service      │     │  (LLM + Context) │     │     Layer       │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-         │                       │
-         │              ┌────────▼────────┐
-         │              │  Sandbox Engine │
-         │              │  (Validation)   │
-         │              └─────────────────┘
-         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    GitHub Repository                            │
-│              (Auto-generated Pull Requests)                     │
-└─────────────────────────────────────────────────────────────────┘
+<br>
+
+```mermaid
+flowchart TB
+    subgraph Input["📥 Event Sources"]
+        GH[GitHub Actions]
+        GL[GitLab CI]
+        CCI[CircleCI]
+        JNK[Jenkins]
+    end
+    
+    subgraph Core["⚙️ SRE Agent Core"]
+        WH[Webhook Handler]
+        ES[Event Store]
+        CTX[Context Builder]
+        RCA[RCA Engine]
+        ADAPT[Adapter Layer]
+    end
+    
+    subgraph AI["🧠 AI Pipeline"]
+        PLAN[Plan Generator]
+        PATCH[Patch Generator]
+        POLICY[Policy Engine]
+        SCAN[Security Scans]
+        SANDBOX[Sandbox Validator]
+    end
+    
+    subgraph Output["📤 Output"]
+        PR[PR Creation]
+        NOTIFY[Notifications]
+        DASH[Dashboard]
+    end
+    
+    subgraph Infra["🔧 Infrastructure"]
+        DB[(PostgreSQL)]
+        REDIS[(Redis)]
+        CELERY[Celery Workers]
+        PROM[Prometheus]
+        GRAF[Grafana]
+    end
+    
+    GH & GL & CCI & JNK --> WH
+    WH --> ES --> DB
+    WH --> CELERY
+    CELERY --> CTX --> RCA --> ADAPT
+    ADAPT --> PLAN --> PATCH --> POLICY --> SCAN --> SANDBOX
+    SANDBOX --> PR
+    SANDBOX --> NOTIFY
+    SANDBOX --> DASH
+    
+    CELERY <--> REDIS
+    PROM --> GRAF
 ```
 
-### Tech Stack
+<br>
 
-| Component | Technology |
-|-----------|------------|
-| **API Framework** | FastAPI (async) |
-| **Task Queue** | Celery + Redis |
-| **Database** | PostgreSQL (async) |
-| **LLM Provider** | Ollama (DeepSeek Coder) |
-| **ML/Embeddings** | Sentence Transformers + FAISS |
-| **Observability** | OpenTelemetry |
-| **Containerization** | Docker + Docker Compose |
+### 🔄 Pipeline Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           DETERMINISTIC FIX PIPELINE                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐       │
+│  │ ADAPTER  │──▶│   PLAN   │──▶│  PATCH   │──▶│   SCAN   │──▶│ VALIDATE │       │
+│  │  SELECT  │   │ (LLM→JSON)│  │(Diff Gen)│   │(Security)│   │(Sandbox) │       │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘       │
+│       │              │              │              │              │              │
+│       ▼              ▼              ▼              ▼              ▼              │
+│   Language       Fix Plan      Unified       gitleaks       Tests Pass?         │
+│   Detection      JSON Only     Diff File     trivy/SBOM     ────────────        │
+│                                              Secrets Scan   If YES → PR          │
+│                                                             If NO → Alert        │
+│                                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+<br>
+
+### 🛠️ Tech Stack
+
+<table>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+<tr>
+<td><b>🌐 API</b></td>
+<td><img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white"/></td>
+<td>Async REST API framework</td>
+</tr>
+<tr>
+<td><b>🖥️ Frontend</b></td>
+<td><img src="https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black"/> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white"/> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white"/></td>
+<td>Modern reactive UI</td>
+</tr>
+<tr>
+<td><b>⚡ Task Queue</b></td>
+<td><img src="https://img.shields.io/badge/Celery-37814A?style=flat-square&logo=celery&logoColor=white"/> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white"/></td>
+<td>Async task processing</td>
+</tr>
+<tr>
+<td><b>💾 Database</b></td>
+<td><img src="https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white"/></td>
+<td>Event and run persistence</td>
+</tr>
+<tr>
+<td><b>🧠 AI/LLM</b></td>
+<td><img src="https://img.shields.io/badge/Ollama-000000?style=flat-square"/> <img src="https://img.shields.io/badge/DeepSeek_Coder-FF6B6B?style=flat-square"/></td>
+<td>Fix plan generation</td>
+</tr>
+<tr>
+<td><b>🔍 Embeddings</b></td>
+<td><img src="https://img.shields.io/badge/Sentence_Transformers-FF9A00?style=flat-square"/> <img src="https://img.shields.io/badge/FAISS-00B4D8?style=flat-square"/></td>
+<td>Semantic log analysis</td>
+</tr>
+<tr>
+<td><b>📊 Observability</b></td>
+<td><img src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white"/> <img src="https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white"/> <img src="https://img.shields.io/badge/OpenTelemetry-425CC7?style=flat-square&logo=opentelemetry&logoColor=white"/></td>
+<td>Metrics, dashboards, tracing</td>
+</tr>
+<tr>
+<td><b>🐳 Container</b></td>
+<td><img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"/> <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=flat-square&logo=docker&logoColor=white"/></td>
+<td>Containerization & orchestration</td>
+</tr>
+</table>
+
+<br>
 
 ---
 
+<br>
+
 ## 🚀 Quick Start
+
+<br>
 
 ### Prerequisites
 
-- **Python 3.11+**
-- **Docker & Docker Compose**
-- **Poetry** (Python package manager)
-- **GitHub Personal Access Token** (for API access)
+<table>
+<tr>
+<td>✅</td>
+<td><b>Python 3.11+</b></td>
+<td>Core runtime</td>
+</tr>
+<tr>
+<td>✅</td>
+<td><b>Docker & Docker Compose</b></td>
+<td>Container orchestration</td>
+</tr>
+<tr>
+<td>✅</td>
+<td><b>Poetry</b></td>
+<td>Python dependency management</td>
+</tr>
+<tr>
+<td>✅</td>
+<td><b>Node.js 18+</b></td>
+<td>Frontend development</td>
+</tr>
+<tr>
+<td>✅</td>
+<td><b>GitHub PAT</b></td>
+<td>API access for webhooks</td>
+</tr>
+</table>
 
-### Option 1: Docker (Recommended)
+<br>
+
+### 🐳 Option 1: Docker (Recommended)
 
 ```bash
 # Clone the repository
@@ -174,7 +461,7 @@ cd Autonomous-Al-powered-SRE-Agent
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your GitHub token and other settings
+# Edit .env with your GitHub token and settings
 
 # Start all services
 docker-compose up -d
@@ -183,9 +470,9 @@ docker-compose up -d
 docker-compose ps
 ```
 
-The API will be available at `http://localhost:8000`
+<br>
 
-### Option 2: Local Development
+### 💻 Option 2: Local Development
 
 ```bash
 # Clone the repository
@@ -195,32 +482,69 @@ cd Autonomous-Al-powered-SRE-Agent
 # Configure environment
 cp .env.example .env
 
-# Start infrastructure services
+# Start infrastructure
 docker-compose up -d postgres redis
 
-# Install dependencies
+# Install Python dependencies
 poetry install
 
 # Run database migrations
 poetry run alembic upgrade head
 
-# Start the API server (Terminal 1)
+# Terminal 1: Start API server
 poetry run uvicorn sre_agent.main:app --reload --host 0.0.0.0 --port 8000
 
-# Start the Celery worker (Terminal 2)
+# Terminal 2: Start Celery worker
 poetry run celery -A sre_agent.celery_app worker --loglevel=info
+
+# Terminal 3: Start frontend
+cd frontend && npm ci && npm run dev
 ```
+
+<br>
+
+### 🌐 Access Points
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| 🖥️ **Dashboard** | http://localhost:3000 | React frontend |
+| 📚 **API Docs** | http://localhost:8000/docs | Swagger UI |
+| 📊 **Prometheus** | http://localhost:9090 | Metrics |
+| 📈 **Grafana** | http://localhost:3001 | Dashboards |
+
+<br>
 
 ---
 
+<br>
+
 ## 🔌 API Reference
 
-### Health Check
+<br>
+
+### Core Endpoints
+
+<details>
+<summary><b>🏥 Health Check</b></summary>
+
 ```http
 GET /health
 ```
 
-### Ingest CI/CD Event
+**Response:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "database": "connected",
+  "redis": "connected"
+}
+```
+</details>
+
+<details>
+<summary><b>📥 Ingest CI/CD Event</b></summary>
+
 ```http
 POST /api/v1/events/ingest
 Content-Type: application/json
@@ -233,125 +557,314 @@ Content-Type: application/json
   "logs_url": "https://api.github.com/..."
 }
 ```
+</details>
 
-### Get Failure Analysis
+<details>
+<summary><b>🔍 Get Failure Analysis</b></summary>
+
 ```http
 GET /api/v1/failures/{failure_id}/analysis
 ```
 
-### Generate Fix
+**Response:**
+```json
+{
+  "failure_id": "abc123",
+  "root_cause": "Missing runtime dependency: requests",
+  "category": "python_missing_dependency",
+  "confidence": 0.92,
+  "evidence": ["ModuleNotFoundError: No module named 'requests'"]
+}
+```
+</details>
+
+<details>
+<summary><b>🔧 Generate Fix</b></summary>
+
 ```http
 POST /api/v1/failures/{failure_id}/fix
 ```
+</details>
 
-📖 **Full API documentation available at:** `http://localhost:8000/docs`
+<details>
+<summary><b>🧾 Get Explanation (Explainability API)</b></summary>
+
+```http
+GET /api/v1/failures/{failure_id}/explain
+```
+
+Returns evidence-based failure explanation with:
+- Root cause + log evidence with line indices
+- Danger score breakdown
+- Policy violations
+</details>
+
+<details>
+<summary><b>📜 Get Provenance Artifact</b></summary>
+
+```http
+GET /api/v1/runs/{run_id}/artifact
+```
+
+Returns full provenance including:
+- Plan JSON, policy decisions
+- Scan results (gitleaks, trivy, SBOM)
+- Validation results
+</details>
+
+<br>
+
+📖 **Full API documentation:** http://localhost:8000/docs
+
+<br>
 
 ---
+
+<br>
 
 ## ⚙️ Configuration
 
+<br>
+
+### Environment Variables
+
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `GITHUB_TOKEN` | GitHub Personal Access Token | Required |
-| `GITHUB_WEBHOOK_SECRET` | Webhook signature secret | Required |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://...` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379/0` |
-| `LLM_PROVIDER` | LLM provider (ollama) | `ollama` |
-| `OLLAMA_MODEL` | Model for fix generation | `deepseek-coder:6.7b` |
+| `GITHUB_TOKEN` | GitHub Personal Access Token | **Required** |
+| `GITHUB_WEBHOOK_SECRET` | Webhook signature secret | **Required** |
+| `DATABASE_URL` | PostgreSQL connection | `postgresql+asyncpg://...` |
+| `REDIS_URL` | Redis connection | `redis://localhost:6379/0` |
+| `LLM_PROVIDER` | LLM provider | `ollama` |
+| `OLLAMA_MODEL` | Model for fixes | `deepseek-coder:6.7b` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` |
+
+<br>
+
+### 🛡️ Safety Policy
+
+The agent enforces configurable safety policies before applying patches:
+
+```yaml
+# config/safety_policy.yaml
+paths:
+  allowed:
+    - "src/**"
+    - "tests/**"
+  forbidden:
+    - ".github/workflows/**"  # Never edit workflows
+    
+secrets:
+  forbidden_patterns:
+    - "(?i)api[_-]?key"
+    - "(?i)password"
+    
+patch_limits:
+  max_files: 10
+  max_lines_added: 500
+  max_lines_removed: 200
+  
+danger:
+  safe_max: 25  # Score < 25 = "safe" label
+```
+
+<br>
+
+### 🔒 Security Scans
+
+All fixes are validated with supply-chain scanning:
+
+| Scanner | Purpose | Behavior |
+|---------|---------|----------|
+| **gitleaks** | Secrets detection | Any finding → blocks PR |
+| **trivy fs** | Vulnerability scan | Blocks if severity ≥ HIGH |
+| **syft** | SBOM generation | Stored for audit |
+
+<br>
 
 ---
 
+<br>
+
 ## 🧪 Testing
+
+<br>
 
 ```bash
 # Run all tests
 poetry run pytest
 
-# Run with coverage report
+# Run with coverage
 poetry run pytest --cov=src/sre_agent --cov-report=html
 
-# Run specific test file
+# Run specific tests
 poetry run pytest tests/test_api.py -v
+
+# Run offline evaluation harness
+python -m evals.run --limit 35 --model mock --out evals/results/run_local
 ```
+
+<br>
+
+### 📊 Evaluation Metrics
+
+| Model | Cases | Fix Success | Safe Fix Rate | Avg Danger | Avg MTTR |
+|-------|------:|------------:|--------------:|-----------:|---------:|
+| mock  | 35    | 71.4%       | 71.4%         | 13.0       | 0.00s    |
+
+<br>
 
 ---
 
-## � Project Structure
+<br>
+
+## 📁 Project Structure
+
+<br>
 
 ```
-.
-├── src/sre_agent/          # Main application package
-│   ├── ai/                 # AI/LLM integration modules
-│   ├── api/                # FastAPI routes and endpoints
-│   ├── core/               # Core utilities and configs
-│   ├── intelligence/       # Failure analysis engine
-│   ├── knowledge/          # Knowledge base and embeddings
-│   ├── models/             # SQLAlchemy database models
-│   ├── pr/                 # Pull request creation service
-│   ├── sandbox/            # Sandbox validation engine
-│   ├── schemas/            # Pydantic request/response models
-│   ├── services/           # Business logic services
-│   └── tasks/              # Celery async tasks
-├── tests/                  # Test suite
-├── alembic/                # Database migrations
-├── docker-compose.yml      # Docker orchestration
-├── Dockerfile              # Container build instructions
-└── pyproject.toml          # Project dependencies
+📦 Autonomous-AI-powered-SRE-Agent
+├── 📂 src/sre_agent/           # Main application package
+│   ├── 📂 adapters/            # Multi-language adapters (Python, Node, Go, Java, Docker)
+│   ├── 📂 ai/                  # AI/LLM integration (plan generation, embeddings)
+│   ├── 📂 api/                 # FastAPI routes and endpoints
+│   ├── 📂 auth/                # Authentication & RBAC
+│   ├── 📂 explainability/      # Evidence-based explanations
+│   ├── 📂 fix_pipeline/        # Deterministic fix pipeline
+│   ├── 📂 intelligence/        # RCA engine
+│   ├── 📂 knowledge/           # Knowledge base & embeddings
+│   ├── 📂 models/              # SQLAlchemy database models
+│   ├── 📂 notifications/       # SSE & push notifications
+│   ├── 📂 observability/       # Metrics & tracing
+│   ├── 📂 pr/                  # Pull request creation
+│   ├── 📂 safety/              # Policy engine & security
+│   ├── 📂 sandbox/             # Sandbox validation engine
+│   ├── 📂 schemas/             # Pydantic models
+│   ├── 📂 services/            # Business logic
+│   └── 📂 tasks/               # Celery async tasks
+├── 📂 frontend/                # React 18 + TypeScript dashboard
+├── 📂 observability/           # Prometheus, Grafana, Tempo configs
+├── 📂 evals/                   # Offline evaluation harness
+├── 📂 tests/                   # Test suite
+├── 📂 docs/                    # Documentation
+├── 📂 alembic/                 # Database migrations
+├── 📄 docker-compose.yml       # Container orchestration
+├── 📄 Dockerfile               # Container build
+└── 📄 pyproject.toml           # Python dependencies
 ```
+
+<br>
 
 ---
+
+<br>
 
 ## 🗺️ Roadmap
 
+<br>
+
 ### ✅ Completed
+
 - [x] 🏗️ Project foundation & architecture
-- [x] 📡 Event ingestion API
+- [x] 📡 Event ingestion API (GitHub, GitLab)
 - [x] 🧠 AI fix generation engine
 - [x] 🏖️ Sandbox validation engine
 - [x] 📋 PR creation service
-- [x] 🌐 React Dashboard (Web UI)
-- [x] 🔐 User Authentication & Authorization
+- [x] 🌐 React 18 Dashboard
+- [x] 🔐 JWT Authentication & RBAC
 - [x] 🔔 Real-time Notifications (SSE)
 - [x] 📊 Dashboard API & Analytics
 - [x] 📝 Audit Logging System
+- [x] 🧾 Explainability + Trust Dashboard
+- [x] 📈 Observability Stack (Prometheus, Grafana, OTel)
+- [x] 🌍 Multi-Language Adapters (Python, Node, Go, Java, Docker)
+- [x] 🔒 Security Scans (gitleaks, trivy, SBOM)
+
+<br>
 
 ### 🚧 In Progress
-- [ ] 🔄 Multi-CI/CD platform support (CircleCI, GitLab)
-- [ ] � Advanced Analytics & Reporting
-- [ ] � Enhanced Security Features
+
+- [ ] 🔄 CircleCI & Jenkins integration
+- [ ] 📊 Advanced analytics & reporting
+- [ ] 🔐 Enhanced security features
+
+<br>
 
 ### 🔮 Planned
+
 - [ ] 📱 Mobile-responsive PWA
-- [ ] 🤖 AI Model Fine-tuning
-- [ ] � Multi-region Deployment Support
-- [ ] 📊 Custom Dashboard Widgets
+- [ ] 🤖 AI model fine-tuning
+- [ ] 🌐 Multi-region deployment
+- [ ] 📊 Custom dashboard widgets
+- [ ] 🔗 Slack/Teams integrations
+
+<br>
 
 ---
+
+<br>
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+<br>
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We welcome contributions! Here's how to get started:
+
+```bash
+# 1. Fork the repository
+
+# 2. Create your feature branch
+git checkout -b feature/AmazingFeature
+
+# 3. Commit your changes
+git commit -m 'Add some AmazingFeature'
+
+# 4. Push to the branch
+git push origin feature/AmazingFeature
+
+# 5. Open a Pull Request
+```
+
+<br>
+
+### 📏 Code Standards
+
+- ✅ Follow PEP 8 for Python
+- ✅ Use TypeScript strict mode for frontend
+- ✅ Add tests for new features
+- ✅ Update documentation
+
+<br>
 
 ---
+
+<br>
 
 ## 📄 License
 
+<br>
+
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+<br>
 
 ---
 
+<br>
+
 <p align="center">
-  <strong>Built with ❤️ for SRE teams everywhere</strong>
+  <b>Built with ❤️ for SRE teams everywhere</b>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mrgig7/Autonomous-Al-powered-SRE-Agent/issues">Report Bug</a> •
-  <a href="https://github.com/Mrgig7/Autonomous-Al-powered-SRE-Agent/issues">Request Feature</a>
+  <a href="https://github.com/Mrgig7/Autonomous-Al-powered-SRE-Agent/issues">🐛 Report Bug</a>
+  •
+  <a href="https://github.com/Mrgig7/Autonomous-Al-powered-SRE-Agent/issues">💡 Request Feature</a>
+  •
+  <a href="https://github.com/Mrgig7/Autonomous-Al-powered-SRE-Agent/stargazers">⭐ Star the Repo</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/Mrgig7/Autonomous-Al-powered-SRE-Agent?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/forks/Mrgig7/Autonomous-Al-powered-SRE-Agent?style=social" alt="Forks">
+  <img src="https://img.shields.io/github/watchers/Mrgig7/Autonomous-Al-powered-SRE-Agent?style=social" alt="Watchers">
 </p>

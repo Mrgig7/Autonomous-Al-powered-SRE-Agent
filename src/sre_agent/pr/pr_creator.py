@@ -2,8 +2,8 @@
 
 Creates PRs for validated fixes via GitHub API.
 """
+
 import logging
-from typing import Any
 
 import httpx
 
@@ -143,6 +143,7 @@ class PRCreator:
                         client,
                         request.repo,
                         pr_number,
+                        request.labels,
                     )
 
                     logger.info(
@@ -159,6 +160,21 @@ class PRCreator:
                         fix_id=request.fix_id,
                         event_id=request.event_id,
                         title=title,
+                    )
+                if response.status_code == 422:
+                    existing = await self.find_open_pr_by_head(
+                        request=request,
+                        head_branch=branch_name,
+                    )
+                    if existing is not None:
+                        return existing
+                    return PRResult(
+                        status=PRStatus.FAILED,
+                        branch_name=branch_name,
+                        base_branch=request.base_branch,
+                        fix_id=request.fix_id,
+                        event_id=request.event_id,
+                        error_message="PR already exists but could not be located",
                     )
                 else:
                     error_msg = response.text
@@ -185,6 +201,39 @@ class PRCreator:
                 error_message=str(e),
             )
 
+    async def find_open_pr_by_head(
+        self, *, request: PRRequest, head_branch: str
+    ) -> PRResult | None:
+        owner = request.repo.split("/")[0]
+        async with httpx.AsyncClient(
+            base_url=self.base_url,
+            headers=self._build_headers(),
+            timeout=30.0,
+        ) as client:
+            response = await client.get(
+                f"/repos/{request.repo}/pulls",
+                params={"state": "open", "head": f"{owner}:{head_branch}"},
+            )
+            if response.status_code != 200:
+                return None
+            prs = response.json()
+            if not isinstance(prs, list) or not prs:
+                return None
+            pr = prs[0]
+            pr_number = int(pr.get("number"))
+            pr_url = str(pr.get("html_url"))
+            title = str(pr.get("title") or "")
+            return PRResult(
+                pr_number=pr_number,
+                pr_url=pr_url,
+                status=PRStatus.CREATED,
+                branch_name=head_branch,
+                base_branch=request.base_branch,
+                fix_id=request.fix_id,
+                event_id=request.event_id,
+                title=title,
+            )
+
     async def _add_labels(
         self,
         client: httpx.AsyncClient,
@@ -193,7 +242,8 @@ class PRCreator:
         labels: list[str] | None = None,
     ) -> None:
         """Add labels to a PR."""
-        labels = labels or ["auto-fix", "sre-agent"]
+        base_labels = ["auto-fix", "sre-agent"]
+        labels = base_labels if labels is None else list(dict.fromkeys(base_labels + labels))
 
         try:
             await client.post(

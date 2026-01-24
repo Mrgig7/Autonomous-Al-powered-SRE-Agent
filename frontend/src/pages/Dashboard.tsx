@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import api from '../api/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { format } from 'date-fns';
+import FailureDetails from './FailureDetails';
 
 interface User {
   id: string;
@@ -136,6 +137,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <Routes>
           <Route path="/" element={<OverviewPage overview={overview} trends={trends} repoStats={repoStats} />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/failures/:failureId" element={<FailureDetails />} />
           <Route path="/approvals" element={<ApprovalsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/users" element={<UsersPage />} />
@@ -231,7 +233,7 @@ function OverviewPage({ overview, trends, repoStats }: {
           <tbody>
             {recent_failures.map((event) => (
               <tr key={event.id}>
-                <td>{event.repository}</td>
+                <td><Link to={`/failures/${event.id}`} className="link">{event.repository}</Link></td>
                 <td>{event.branch}</td>
                 <td>{event.ci_provider}</td>
                 <td>{format(new Date(event.created_at), 'MMM d, HH:mm')}</td>
@@ -290,7 +292,7 @@ function EventsPage() {
               <tbody>
                 {events.map((event) => (
                   <tr key={event.id}>
-                    <td>{event.repository}</td>
+                    <td><Link to={`/failures/${event.id}`} className="link">{event.repository}</Link></td>
                     <td>{event.branch}</td>
                     <td>{event.ci_provider}</td>
                     <td>{format(new Date(event.created_at), 'MMM d, HH:mm')}</td>

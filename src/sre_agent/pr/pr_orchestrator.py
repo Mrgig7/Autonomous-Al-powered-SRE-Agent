@@ -2,6 +2,7 @@
 
 Coordinates the full PR creation workflow.
 """
+
 import logging
 from pathlib import Path
 from uuid import UUID
@@ -78,6 +79,23 @@ class PROrchestrator:
 
         # Generate branch name
         branch_name = self.branch_manager.generate_branch_name(fix.fix_id)
+        if not fix.is_safe_to_apply:
+            return PRResult(
+                status=PRStatus.FAILED,
+                branch_name=branch_name,
+                base_branch=base_branch,
+                fix_id=fix.fix_id,
+                event_id=fix.event_id,
+                error_message="Fix blocked by safety policy or guardrails",
+            )
+
+        request = self._build_pr_request(fix, rca_result, validation, repo, base_branch)
+        existing = await self.pr_creator.find_open_pr_by_head(
+            request=request,
+            head_branch=branch_name,
+        )
+        if existing and existing.pr_url:
+            return existing
 
         repo_path: Path | None = None
 
@@ -99,9 +117,6 @@ class PROrchestrator:
             await self.branch_manager.push_branch(repo_path, branch_name)
 
             # Create PR
-            request = self._build_pr_request(
-                fix, rca_result, validation, repo, base_branch
-            )
             result = await self.pr_creator.create_pr(request, branch_name)
 
             return result
@@ -173,6 +188,7 @@ Fix ID: {fix.fix_id}
             repo=repo,
             base_branch=base_branch,
             diff=fix.full_diff,
+            labels=[fix.safety_status.pr_label] if fix.safety_status else ["needs-review"],
             error_type=rca_result.classification.category.value,
             hypothesis=rca_result.primary_hypothesis.description,
             confidence=rca_result.primary_hypothesis.confidence,

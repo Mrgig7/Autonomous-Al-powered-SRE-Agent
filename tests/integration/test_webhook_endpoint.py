@@ -1,11 +1,9 @@
 """Integration tests for webhook API endpoint."""
-import hashlib
-import hmac
+
 import json
 from typing import Any
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 
@@ -114,8 +112,8 @@ class TestGitHubWebhookEndpoint:
         sample_github_workflow_job_payload: dict[str, Any],
     ) -> None:
         """Failed job should be accepted and processed."""
-        from uuid import uuid4
         from unittest.mock import AsyncMock, MagicMock
+        from uuid import uuid4
 
         # Mock the event store
         mock_event = MagicMock()

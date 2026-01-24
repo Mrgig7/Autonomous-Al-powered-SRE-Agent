@@ -10,6 +10,62 @@ interface FetchOptions {
   headers?: Record<string, string>;
 }
 
+export type FailureExplainResponse = {
+  failure_id: string;
+  repo: string;
+  summary: {
+    category?: string | null;
+    root_cause?: string | null;
+    adapter?: string | null;
+    confidence: number;
+    confidence_breakdown: Array<{
+      factor: string;
+      value: number;
+      weight: number;
+      note: string;
+    }>;
+  };
+  evidence: Array<{
+    idx: number;
+    line: string;
+    tag: string;
+    operation_idx?: number | null;
+  }>;
+  proposed_fix: {
+    plan?: any;
+    files: string[];
+    diff_available: boolean;
+  };
+  safety: any;
+  validation: any;
+  run: {
+    run_id?: string | null;
+    status?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+  };
+  timeline: any[];
+  generated_at: string;
+};
+
+export type RunDiffResponse = {
+  run_id: string;
+  diff_text: string;
+  stats?: any;
+  redacted: boolean;
+};
+
+export type RunTimelineResponse = {
+  run_id: string;
+  timeline: Array<{
+    step: string;
+    status: string;
+    started_at?: string | null;
+    completed_at?: string | null;
+    duration_ms?: number | null;
+  }>;
+};
+
 class ApiClient {
   private token: string | null = null;
 
@@ -163,6 +219,22 @@ class ApiClient {
       success_rate: number;
       last_event_at?: string;
     }>>('/dashboard/repos');
+  }
+
+  async getFailureExplain(failureId: string) {
+    return this.fetch<FailureExplainResponse>(`/failures/${failureId}/explain`);
+  }
+
+  async getRunArtifact(runId: string) {
+    return this.fetch<any>(`/runs/${runId}/artifact`);
+  }
+
+  async getRunDiff(runId: string) {
+    return this.fetch<RunDiffResponse>(`/runs/${runId}/diff`);
+  }
+
+  async getRunTimeline(runId: string) {
+    return this.fetch<RunTimelineResponse>(`/runs/${runId}/timeline`);
   }
 
   async getSystemHealth() {

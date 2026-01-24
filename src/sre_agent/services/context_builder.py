@@ -3,9 +3,9 @@
 Aggregates observability data (logs, git context, timing) to build
 a FailureContextBundle for downstream RCA.
 """
+
 import logging
 from datetime import datetime
-from uuid import UUID
 
 from sre_agent.models.events import PipelineEvent
 from sre_agent.schemas.context import (
@@ -15,8 +15,8 @@ from sre_agent.schemas.context import (
     StepTiming,
 )
 from sre_agent.services.github_client import (
-    GitHubClient,
     GitHubAPIError,
+    GitHubClient,
     GitHubNotFoundError,
 )
 from sre_agent.services.log_parser import LogParser
@@ -173,7 +173,7 @@ class ContextBuilder:
             truncated = False
             if size_bytes > self.max_log_size_bytes:
                 # Truncate to last N bytes (end usually has the error)
-                log_content = log_content[-self.max_log_size_bytes:]
+                log_content = log_content[-self.max_log_size_bytes :]
                 truncated = True
                 logger.info(
                     "Log content truncated",
@@ -223,9 +223,7 @@ class ContextBuilder:
             )
 
             bundle.commit_message = commit.get("commit", {}).get("message")
-            bundle.commit_author = (
-                commit.get("commit", {}).get("author", {}).get("name")
-            )
+            bundle.commit_author = commit.get("commit", {}).get("author", {}).get("name")
 
             # Extract changed files
             files = commit.get("files", [])

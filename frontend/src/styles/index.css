@@ -23,7 +23,13 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -49,7 +55,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Login Page */
@@ -135,7 +143,9 @@ body {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .login-button:hover {
@@ -372,7 +382,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 0.875rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
@@ -423,7 +434,8 @@ tr:hover {
   color: var(--accent-primary);
 }
 
-.role-badge.admin, .role-badge.super_admin {
+.role-badge.admin,
+.role-badge.super_admin {
   background: rgba(239, 68, 68, 0.2);
   color: var(--error);
 }
@@ -532,7 +544,8 @@ tr:hover {
   margin-bottom: 1rem;
 }
 
-.test-btn, .action-btn {
+.test-btn,
+.action-btn {
   padding: 0.5rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -542,7 +555,8 @@ tr:hover {
   transition: all 0.2s;
 }
 
-.test-btn:hover, .action-btn:hover {
+.test-btn:hover,
+.action-btn:hover {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
 }
@@ -569,16 +583,283 @@ tr:hover {
     height: auto;
     position: relative;
   }
-  
+
   .main-content {
     margin-left: 0;
   }
-  
+
   .charts-row {
     grid-template-columns: 1fr;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.link {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+.mono {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}
+
+.dot-sep {
+  margin: 0 0.5rem;
+}
+
+.btn {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent-primary);
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.tab.active {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.section {
+  margin-top: 1rem;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.preline {
+  white-space: pre-line;
+}
+
+.kv-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.list {
+  margin-left: 1.25rem;
+}
+
+.severity-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.severity-badge.success {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.5);
+  color: var(--success);
+}
+
+.severity-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: var(--warning);
+}
+
+.severity-badge.error {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--error);
+}
+
+.evidence-row {
+  display: grid;
+  grid-template-columns: 60px 120px 1fr;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.evidence-idx {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.evidence-tag {
+  color: var(--accent-secondary);
+}
+
+.evidence-line {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diff-pre {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 520px;
+  white-space: pre;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.85rem;
+}
+
+.diff-section {
+  margin-bottom: 0.75rem;
+}
+
+.diff-summary {
+  cursor: pointer;
+  color: var(--accent-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.json-viewer {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  overflow: auto;
+  max-height: 520px;
+}
+
+.json-row {
+  padding: 0.1rem 0;
+}
+
+.json-key {
+  color: var(--accent-secondary);
+}
+
+.json-null {
+  color: var(--text-secondary);
+}
+
+.json-value {
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.json-summary {
+  cursor: pointer;
+}
+
+.json-children {
+  padding-left: 1rem;
+  border-left: 1px solid var(--border);
+  margin-left: 0.25rem;
+}
+
+.timeline {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 160px 90px 1fr 90px;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.timeline-row:last-child {
+  border-bottom: none;
+}
+
+.timeline-step {
+  font-weight: 600;
+}
+
+.timeline-status {
+  text-transform: lowercase;
+}
+
+.timeline-status.ok {
+  color: var(--success);
+}
+
+.timeline-status.fail {
+  color: var(--error);
+}
+
+.timeline-time {
+  color: var(--text-secondary);
+}
+
+.timeline-duration {
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .kv-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .timeline-row {
+    grid-template-columns: 120px 80px 1fr 70px;
   }
 }

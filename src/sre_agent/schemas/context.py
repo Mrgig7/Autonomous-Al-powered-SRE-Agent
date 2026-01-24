@@ -3,6 +3,7 @@
 These schemas represent the aggregated observability data
 that will be used by the Failure Intelligence Layer for RCA.
 """
+
 from datetime import datetime
 from enum import Enum
 from typing import Literal

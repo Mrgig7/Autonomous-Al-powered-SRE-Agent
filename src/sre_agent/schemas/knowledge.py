@@ -1,4 +1,5 @@
 """Schemas for knowledge and learning store."""
+
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
@@ -82,7 +83,11 @@ class IncidentRecord(BaseModel):
     @property
     def is_resolved(self) -> bool:
         """Check if incident is resolved."""
-        return self.status in (IncidentStatus.MERGED, IncidentStatus.FAILED, IncidentStatus.ROLLED_BACK)
+        return self.status in (
+            IncidentStatus.MERGED,
+            IncidentStatus.FAILED,
+            IncidentStatus.ROLLED_BACK,
+        )
 
     @property
     def was_successful(self) -> bool:

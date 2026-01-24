@@ -1,4 +1,5 @@
 """Schemas for Pull Request operations."""
+
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
@@ -52,6 +53,7 @@ class PRRequest(BaseModel):
     diff: str = Field(..., description="Unified diff to apply")
     title: str | None = Field(None, description="Custom PR title")
     description: str | None = Field(None, description="Custom PR body")
+    labels: list[str] | None = Field(None, description="Labels to apply to the PR")
 
     # RCA context for PR body
     error_type: str | None = None

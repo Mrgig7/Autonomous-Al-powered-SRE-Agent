@@ -16,19 +16,18 @@ Optimized for high-traffic with:
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
-from sqlalchemy import func, select, and_, case
+from pydantic import BaseModel
+from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sre_agent.auth.jwt_handler import TokenPayload
 from sre_agent.auth.permissions import get_current_user, require_permission
 from sre_agent.auth.rbac import Permission
-from sre_agent.auth.jwt_handler import TokenPayload
 from sre_agent.database import get_async_session
-from sre_agent.models.events import PipelineEvent, EventStatus
+from sre_agent.models.events import EventStatus, PipelineEvent
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -38,8 +37,10 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 # RESPONSE MODELS
 # =========================================
 
+
 class EventSummary(BaseModel):
     """Summary of a pipeline event."""
+
     id: str
     repository: str
     branch: str
@@ -51,6 +52,7 @@ class EventSummary(BaseModel):
 
 class OverviewStats(BaseModel):
     """Dashboard overview statistics."""
+
     total_events: int
     failures_24h: int
     fixes_generated_24h: int
@@ -61,6 +63,7 @@ class OverviewStats(BaseModel):
 
 class TrendPoint(BaseModel):
     """A single point in a trend line."""
+
     date: str
     count: int
     success_count: int = 0
@@ -69,6 +72,7 @@ class TrendPoint(BaseModel):
 
 class RepoStats(BaseModel):
     """Statistics for a repository."""
+
     repository: str
     total_events: int
     failures: int
@@ -80,6 +84,7 @@ class RepoStats(BaseModel):
 
 class DashboardOverview(BaseModel):
     """Complete dashboard overview response."""
+
     stats: OverviewStats
     recent_failures: list[EventSummary]
     pending_approvals: int
@@ -88,6 +93,7 @@ class DashboardOverview(BaseModel):
 
 class PaginatedEventsResponse(BaseModel):
     """Paginated events response."""
+
     events: list[EventSummary]
     total: int
     limit: int
@@ -110,16 +116,16 @@ async def get_cached_or_compute(
     """Get from cache or compute and cache."""
     try:
         from sre_agent.core.redis_service import get_redis_service
-        
+
         redis = get_redis_service()
         cached = await redis.cache_get(cache_key)
         if cached is not None:
             return cached
-        
+
         result = await compute_fn()
         await redis.cache_set(cache_key, result, ttl)
         return result
-        
+
     except Exception as e:
         logger.warning(f"Cache error: {e}, computing directly")
         return await compute_fn()
@@ -128,6 +134,7 @@ async def get_cached_or_compute(
 # =========================================
 # ENDPOINTS
 # =========================================
+
 
 @router.get(
     "/overview",
@@ -140,29 +147,31 @@ async def get_overview(
     session: AsyncSession = Depends(get_async_session),
 ) -> DashboardOverview:
     """Get complete dashboard overview with stats and recent activity."""
-    
+
     async def compute():
         now = datetime.utcnow()
         yesterday = now - timedelta(days=1)
-        last_week = now - timedelta(days=7)
-        
+
         # Get overview stats
         stats_result = await session.execute(
             select(
                 func.count(PipelineEvent.id).label("total"),
                 func.sum(
                     case(
-                        (and_(
-                            PipelineEvent.created_at >= yesterday,
-                            PipelineEvent.status == EventStatus.FAILED.value
-                        ), 1),
-                        else_=0
+                        (
+                            and_(
+                                PipelineEvent.created_at >= yesterday,
+                                PipelineEvent.status == EventStatus.FAILED.value,
+                            ),
+                            1,
+                        ),
+                        else_=0,
                     )
                 ).label("failures_24h"),
             )
         )
         stats_row = stats_result.one()
-        
+
         # Recent failures
         failures_result = await session.execute(
             select(PipelineEvent)
@@ -171,7 +180,7 @@ async def get_overview(
             .limit(10)
         )
         recent_failures = failures_result.scalars().all()
-        
+
         return {
             "stats": {
                 "total_events": stats_row.total or 0,
@@ -196,13 +205,13 @@ async def get_overview(
             "pending_approvals": 0,
             "active_fixes": 0,
         }
-    
+
     data = await get_cached_or_compute(
         f"dashboard:overview:{current_user.user_id}",
         compute,
         ttl=30,  # 30 second cache
     )
-    
+
     return DashboardOverview(**data)
 
 
@@ -225,9 +234,9 @@ async def get_events(
     """Get paginated pipeline events with filtering."""
     query = select(PipelineEvent)
     count_query = select(func.count(PipelineEvent.id))
-    
+
     conditions = []
-    
+
     if status:
         conditions.append(PipelineEvent.status == status)
     if repository:
@@ -238,22 +247,22 @@ async def get_events(
         conditions.append(PipelineEvent.created_at >= start_date)
     if end_date:
         conditions.append(PipelineEvent.created_at <= end_date)
-    
+
     if conditions:
         query = query.where(and_(*conditions))
         count_query = count_query.where(and_(*conditions))
-    
+
     # Get total count
     total_result = await session.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Get events
     query = query.order_by(PipelineEvent.created_at.desc())
     query = query.limit(limit).offset(offset)
-    
+
     result = await session.execute(query)
     events = result.scalars().all()
-    
+
     return PaginatedEventsResponse(
         events=[
             EventSummary(
@@ -287,39 +296,36 @@ async def get_trends(
 ) -> list[TrendPoint]:
     """Get daily event trends for charts."""
     cache_key = f"dashboard:trends:{days}:{repository or 'all'}"
-    
+
     async def compute():
         now = datetime.utcnow()
         start_date = now - timedelta(days=days)
-        
+
         # Group by date
         date_col = func.date(PipelineEvent.created_at)
-        
-        query = select(
-            date_col.label("date"),
-            func.count(PipelineEvent.id).label("count"),
-            func.sum(
-                case(
-                    (PipelineEvent.status == EventStatus.RESOLVED.value, 1),
-                    else_=0
-                )
-            ).label("success_count"),
-            func.sum(
-                case(
-                    (PipelineEvent.status == EventStatus.FAILED.value, 1),
-                    else_=0
-                )
-            ).label("failure_count"),
-        ).where(
-            PipelineEvent.created_at >= start_date
-        ).group_by(date_col).order_by(date_col)
-        
+
+        query = (
+            select(
+                date_col.label("date"),
+                func.count(PipelineEvent.id).label("count"),
+                func.sum(
+                    case((PipelineEvent.status == EventStatus.RESOLVED.value, 1), else_=0)
+                ).label("success_count"),
+                func.sum(
+                    case((PipelineEvent.status == EventStatus.FAILED.value, 1), else_=0)
+                ).label("failure_count"),
+            )
+            .where(PipelineEvent.created_at >= start_date)
+            .group_by(date_col)
+            .order_by(date_col)
+        )
+
         if repository:
             query = query.where(PipelineEvent.repo.ilike(f"%{repository}%"))
-        
+
         result = await session.execute(query)
         rows = result.all()
-        
+
         return [
             {
                 "date": str(row.date),
@@ -329,7 +335,7 @@ async def get_trends(
             }
             for row in rows
         ]
-    
+
     data = await get_cached_or_compute(cache_key, compute, ttl=300)  # 5 min cache
     return [TrendPoint(**d) for d in data]
 
@@ -346,25 +352,25 @@ async def get_repo_stats(
 ) -> list[RepoStats]:
     """Get statistics grouped by repository."""
     cache_key = f"dashboard:repos:{limit}"
-    
+
     async def compute():
-        query = select(
-            PipelineEvent.repo,
-            func.count(PipelineEvent.id).label("total_events"),
-            func.sum(
-                case(
-                    (PipelineEvent.status == EventStatus.FAILED.value, 1),
-                    else_=0
-                )
-            ).label("failures"),
-            func.max(PipelineEvent.created_at).label("last_event_at"),
-        ).group_by(PipelineEvent.repo).order_by(
-            func.count(PipelineEvent.id).desc()
-        ).limit(limit)
-        
+        query = (
+            select(
+                PipelineEvent.repo,
+                func.count(PipelineEvent.id).label("total_events"),
+                func.sum(
+                    case((PipelineEvent.status == EventStatus.FAILED.value, 1), else_=0)
+                ).label("failures"),
+                func.max(PipelineEvent.created_at).label("last_event_at"),
+            )
+            .group_by(PipelineEvent.repo)
+            .order_by(func.count(PipelineEvent.id).desc())
+            .limit(limit)
+        )
+
         result = await session.execute(query)
         rows = result.all()
-        
+
         return [
             {
                 "repository": row.repo,
@@ -373,15 +379,18 @@ async def get_repo_stats(
                 "fixes_generated": 0,  # Placeholder
                 "fixes_approved": 0,  # Placeholder
                 "success_rate": round(
-                    ((row.total_events - (row.failures or 0)) / row.total_events * 100)
-                    if row.total_events > 0 else 0,
-                    1
+                    (
+                        ((row.total_events - (row.failures or 0)) / row.total_events * 100)
+                        if row.total_events > 0
+                        else 0
+                    ),
+                    1,
                 ),
                 "last_event_at": row.last_event_at.isoformat() if row.last_event_at else None,
             }
             for row in rows
         ]
-    
+
     data = await get_cached_or_compute(cache_key, compute, ttl=120)  # 2 min cache
     return [RepoStats(**d) for d in data]
 
@@ -395,13 +404,13 @@ async def get_system_health() -> dict[str, Any]:
     """Get system health metrics for monitoring."""
     from sre_agent.core.redis_service import get_redis_service
     from sre_agent.services.audit_service import get_audit_service
-    
+
     health = {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "components": {},
     }
-    
+
     # Redis health
     try:
         redis = get_redis_service()
@@ -409,30 +418,32 @@ async def get_system_health() -> dict[str, Any]:
     except Exception as e:
         health["components"]["redis"] = {"status": "unhealthy", "error": str(e)}
         health["status"] = "degraded"
-    
+
     # Audit service
     try:
         audit = get_audit_service()
         health["components"]["audit"] = audit.get_stats()
     except Exception as e:
         health["components"]["audit"] = {"status": "error", "error": str(e)}
-    
+
     # Database (simple check)
     try:
         from sre_agent.database import get_async_session
+
         async with get_async_session() as session:
             await session.execute(select(1))
         health["components"]["database"] = {"status": "healthy"}
     except Exception as e:
         health["components"]["database"] = {"status": "unhealthy", "error": str(e)}
         health["status"] = "unhealthy"
-    
+
     return health
 
 
 # =========================================
 # SERVER-SENT EVENTS FOR REAL-TIME
 # =========================================
+
 
 @router.get(
     "/stream",
@@ -444,7 +455,7 @@ async def stream_events(
     current_user: TokenPayload = Depends(get_current_user),
 ):
     """Server-Sent Events stream for real-time dashboard updates.
-    
+
     Clients can subscribe to receive:
     - New failure notifications
     - Fix generation updates
@@ -452,31 +463,31 @@ async def stream_events(
     """
     import asyncio
     import json
-    
+
     async def event_generator():
         """Generate SSE events."""
         from sre_agent.core.redis_service import get_redis_service
-        
+
         try:
             redis = get_redis_service()
-            
+
             # Subscribe to dashboard events channel
             events_received = asyncio.Queue()
-            
+
             async def handler(data):
                 await events_received.put(data)
-            
+
             await redis.subscribe("dashboard_events", handler)
-            
+
             # Send initial connection event
             yield f"data: {json.dumps({'type': 'connected', 'timestamp': datetime.utcnow().isoformat()})}\n\n"
-            
+
             # Stream events
             while True:
                 # Check if client disconnected
                 if await request.is_disconnected():
                     break
-                
+
                 try:
                     event = await asyncio.wait_for(
                         events_received.get(),
@@ -486,10 +497,10 @@ async def stream_events(
                 except asyncio.TimeoutError:
                     # Send heartbeat
                     yield f"data: {json.dumps({'type': 'heartbeat', 'timestamp': datetime.utcnow().isoformat()})}\n\n"
-                    
+
         except asyncio.CancelledError:
             pass
-    
+
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",

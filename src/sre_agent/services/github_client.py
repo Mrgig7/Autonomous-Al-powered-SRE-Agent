@@ -7,10 +7,11 @@ Uses GitHub REST API v3 to:
 
 Reference: https://docs.github.com/en/rest/actions
 """
+
 import logging
 import zipfile
 from io import BytesIO
-from typing import Any, AsyncIterator
+from typing import Any
 
 import httpx
 
@@ -63,9 +64,7 @@ class GitHubClient:
         self.base_url = (base_url or settings.github_api_base_url).rstrip("/")
 
         if not self.token:
-            logger.warning(
-                "GitHub token not configured - API calls will be rate limited"
-            )
+            logger.warning("GitHub token not configured - API calls will be rate limited")
 
         self._client: httpx.AsyncClient | None = None
 

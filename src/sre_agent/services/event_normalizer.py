@@ -3,9 +3,10 @@
 Transforms provider-specific webhook payloads into a canonical
 NormalizedPipelineEvent format for downstream processing.
 """
+
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC
 from typing import Protocol
 
 from sre_agent.schemas.github import GitHubWorkflowJobPayload
@@ -116,7 +117,7 @@ class GitHubEventNormalizer:
         # Determine event timestamp
         event_timestamp = job.completed_at or job.started_at or job.created_at
         if event_timestamp.tzinfo is None:
-            event_timestamp = event_timestamp.replace(tzinfo=timezone.utc)
+            event_timestamp = event_timestamp.replace(tzinfo=UTC)
 
         normalized = NormalizedPipelineEvent(
             idempotency_key=idempotency_key,
