@@ -11,7 +11,7 @@ from enum import Enum
 from typing import Any, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -141,6 +141,59 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"
+
+
+class GitHubAppInstallation(Base):
+    """Persisted GitHub App installation metadata for onboarding and webhook mapping."""
+
+    __tablename__ = "github_app_installations"
+
+    id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    repo_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    repo_full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    installation_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    automation_mode: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="suggest",
+    )
+    connected_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        Index(
+            "ux_github_app_installations_user_repo",
+            "user_id",
+            "repo_id",
+            unique=True,
+        ),
+        Index(
+            "ux_github_app_installations_installation_id",
+            "installation_id",
+            unique=True,
+        ),
+        Index("ix_github_app_installations_repo_full_name", "repo_full_name"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<GitHubAppInstallation(user_id={self.user_id}, repo={self.repo_full_name}, "
+            f"installation_id={self.installation_id})>"
+        )
 
 
 class ApprovalRequest(Base):
