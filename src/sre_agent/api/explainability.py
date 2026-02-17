@@ -12,6 +12,7 @@ from sre_agent.schemas.explainability import FailureExplainResponse
 router = APIRouter(prefix="/failures", tags=["Explainability"])
 
 
+@router.get("/{failure_id}/analysis", response_model=FailureExplainResponse)
 @router.get("/{failure_id}/explain", response_model=FailureExplainResponse)
 async def explain_failure(
     failure_id: UUID,
