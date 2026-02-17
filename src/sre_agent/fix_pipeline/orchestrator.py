@@ -29,12 +29,12 @@ from sre_agent.models.fix_pipeline import FixPipelineRunStatus
 from sre_agent.observability.metrics import (
     METRICS,
     bucket_danger_score,
+    observe_consensus_agreement,
     record_auto_merge,
     record_consensus_candidate,
     record_consensus_decision,
     record_critic_decision,
     record_manual_approval,
-    observe_consensus_agreement,
 )
 from sre_agent.observability.tracing import start_span
 from sre_agent.pr.pr_orchestrator import PROrchestrator
