@@ -35,6 +35,22 @@ class PrometheusMetrics:
     scan_fail_total: Counter
     celery_tasks_total: Counter
     queue_depth: Gauge
+    oauth_login_success_total: Counter
+    oauth_login_failure_total: Counter
+    repo_fetch_latency_ms: Histogram
+    integration_install_success_total: Counter
+    repo_config_load_success_total: Counter
+    repo_config_load_failure_total: Counter
+    repo_config_missing_total: Counter
+    build_log_ingestion_success_total: Counter
+    build_log_ingestion_failure_total: Counter
+    critic_decision_total: Counter
+    manual_approval_total: Counter
+    auto_merge_total: Counter
+    retry_signature_blocked_total: Counter
+    consensus_rejection_total: Counter
+    consensus_candidate_total: Counter
+    consensus_agreement_rate: Histogram
 
 
 _REGISTRY = CollectorRegistry(auto_describe=True)
@@ -183,6 +199,143 @@ METRICS = PrometheusMetrics(
             registry=_REGISTRY,
         ),
     ),
+    oauth_login_success_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "oauth_login_success_total",
+            "Total successful OAuth login completions",
+            labelnames=("provider",),
+            registry=_REGISTRY,
+        ),
+    ),
+    oauth_login_failure_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "oauth_login_failure_total",
+            "Total failed OAuth login attempts",
+            labelnames=("provider", "reason"),
+            registry=_REGISTRY,
+        ),
+    ),
+    repo_fetch_latency_ms=_get_or_create(
+        _REGISTRY,
+        Histogram(
+            "repo_fetch_latency_ms",
+            "Latency for user repository fetch calls in milliseconds",
+            buckets=(25, 50, 100, 250, 500, 1000, 2500, 5000, 10000),
+            registry=_REGISTRY,
+        ),
+    ),
+    integration_install_success_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "integration_install_success_total",
+            "Total successful GitHub App installation confirmations",
+            registry=_REGISTRY,
+        ),
+    ),
+    repo_config_load_success_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "repo_config_load_success_total",
+            "Total successful repository config file loads",
+            registry=_REGISTRY,
+        ),
+    ),
+    repo_config_load_failure_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "repo_config_load_failure_total",
+            "Total failed repository config file loads",
+            registry=_REGISTRY,
+        ),
+    ),
+    repo_config_missing_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "repo_config_missing_total",
+            "Total repository config lookups where .sre-agent.yaml was not found",
+            registry=_REGISTRY,
+        ),
+    ),
+    build_log_ingestion_success_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "build_log_ingestion_success_total",
+            "Total successful build log ingestion operations",
+            registry=_REGISTRY,
+        ),
+    ),
+    build_log_ingestion_failure_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "build_log_ingestion_failure_total",
+            "Total failed build log ingestion operations",
+            registry=_REGISTRY,
+        ),
+    ),
+    critic_decision_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "critic_decision_total",
+            "Total critic decisions by outcome",
+            labelnames=("outcome",),
+            registry=_REGISTRY,
+        ),
+    ),
+    manual_approval_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "manual_approval_total",
+            "Total manual approval actions by outcome",
+            labelnames=("outcome",),
+            registry=_REGISTRY,
+        ),
+    ),
+    auto_merge_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "auto_merge_total",
+            "Total auto-merge attempts by outcome",
+            labelnames=("outcome",),
+            registry=_REGISTRY,
+        ),
+    ),
+    retry_signature_blocked_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "retry_signature_blocked_total",
+            "Total pipeline blocks due to retry signature limits",
+            registry=_REGISTRY,
+        ),
+    ),
+    consensus_rejection_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "sre_agent_consensus_rejection_total",
+            "Total consensus rejections by reason",
+            labelnames=("reason",),
+            registry=_REGISTRY,
+        ),
+    ),
+    consensus_candidate_total=_get_or_create(
+        _REGISTRY,
+        Counter(
+            "sre_agent_consensus_candidate_total",
+            "Total consensus candidate outcomes by agent",
+            labelnames=("agent", "outcome"),
+            registry=_REGISTRY,
+        ),
+    ),
+    consensus_agreement_rate=_get_or_create(
+        _REGISTRY,
+        Histogram(
+            "sre_agent_consensus_agreement_rate",
+            "Consensus agreement rate distribution",
+            registry=_REGISTRY,
+            buckets=(0.0, 0.25, 0.5, 0.67, 0.75, 0.9, 1.0),
+        ),
+    ),
 )
 
 
@@ -217,3 +370,68 @@ def bucket_danger_score(score: int) -> str:
 
 def start_worker_metrics_server(*, port: int) -> None:
     start_http_server(port, registry=METRICS.registry)
+
+
+def record_oauth_login_success(*, provider: str) -> None:
+    METRICS.oauth_login_success_total.labels(provider=provider).inc()
+
+
+def record_oauth_login_failure(*, provider: str, reason: str) -> None:
+    METRICS.oauth_login_failure_total.labels(provider=provider, reason=reason).inc()
+
+
+def observe_repo_fetch_latency_ms(*, latency_ms: float) -> None:
+    METRICS.repo_fetch_latency_ms.observe(max(0.0, latency_ms))
+
+
+def record_integration_install_success() -> None:
+    METRICS.integration_install_success_total.inc()
+
+
+def record_repo_config_load_success() -> None:
+    METRICS.repo_config_load_success_total.inc()
+
+
+def record_repo_config_load_failure() -> None:
+    METRICS.repo_config_load_failure_total.inc()
+
+
+def record_repo_config_missing() -> None:
+    METRICS.repo_config_missing_total.inc()
+
+
+def record_build_log_ingestion_success() -> None:
+    METRICS.build_log_ingestion_success_total.inc()
+
+
+def record_build_log_ingestion_failure() -> None:
+    METRICS.build_log_ingestion_failure_total.inc()
+
+
+def record_critic_decision(*, outcome: str) -> None:
+    METRICS.critic_decision_total.labels(outcome=outcome).inc()
+
+
+def record_manual_approval(*, outcome: str) -> None:
+    METRICS.manual_approval_total.labels(outcome=outcome).inc()
+
+
+def record_auto_merge(*, outcome: str) -> None:
+    METRICS.auto_merge_total.labels(outcome=outcome).inc()
+
+
+def record_retry_signature_blocked() -> None:
+    METRICS.retry_signature_blocked_total.inc()
+
+
+def record_consensus_decision(*, state: str) -> None:
+    if state.startswith("rejected_"):
+        METRICS.consensus_rejection_total.labels(reason=state).inc()
+
+
+def record_consensus_candidate(*, agent: str, outcome: str) -> None:
+    METRICS.consensus_candidate_total.labels(agent=agent, outcome=outcome).inc()
+
+
+def observe_consensus_agreement(*, rate: float) -> None:
+    METRICS.consensus_agreement_rate.observe(max(0.0, min(1.0, rate)))

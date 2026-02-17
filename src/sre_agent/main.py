@@ -16,11 +16,14 @@ from fastapi.responses import JSONResponse
 from sre_agent import __version__
 from sre_agent.api.artifacts import router as artifacts_router
 from sre_agent.api.auth import router as auth_router
+from sre_agent.api.consensus import router as consensus_router
 from sre_agent.api.dashboard import router as dashboard_router
 from sre_agent.api.explainability import router as explainability_router
 from sre_agent.api.health import router as health_router
+from sre_agent.api.integration import router as integration_router
 from sre_agent.api.metrics import router as metrics_router
 from sre_agent.api.notifications import router as notifications_router
+from sre_agent.api.user_repos import router as user_repos_router
 from sre_agent.api.users import router as users_router
 from sre_agent.api.webhooks.azuredevops import router as azuredevops_router
 from sre_agent.api.webhooks.circleci import router as circleci_router
@@ -147,11 +150,14 @@ def create_app() -> FastAPI:
     app.include_router(jenkins_router)
     app.include_router(azuredevops_router)
     app.include_router(auth_router, prefix=settings.api_prefix)
+    app.include_router(user_repos_router, prefix=settings.api_prefix)
+    app.include_router(integration_router, prefix=settings.api_prefix)
     app.include_router(notifications_router, prefix=settings.api_prefix)
     app.include_router(users_router, prefix=settings.api_prefix)
     app.include_router(dashboard_router, prefix=settings.api_prefix)
     app.include_router(artifacts_router, prefix=settings.api_prefix)
     app.include_router(explainability_router, prefix=settings.api_prefix)
+    app.include_router(consensus_router, prefix=settings.api_prefix)
 
     # Root endpoint
     @app.get("/")

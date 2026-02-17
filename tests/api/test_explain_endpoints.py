@@ -36,6 +36,10 @@ class DummyRun:
     adapter_name: str | None = None
     detection_json: dict[str, Any] | None = None
     artifact_json: dict[str, Any] | None = None
+    issue_graph_json: dict[str, Any] | None = None
+    consensus_json: dict[str, Any] | None = None
+    consensus_shadow_diff_json: dict[str, Any] | None = None
+    consensus_state: str | None = None
 
 
 def _authed_client() -> TestClient:
@@ -129,9 +133,14 @@ def test_failure_explain_endpoint_returns_contract_and_redacts(
     res = client.get(f"/api/v1/failures/{failure_id}/explain")
     assert res.status_code == 200
     body = res.json()
+    alias_res = client.get(f"/api/v1/failures/{failure_id}/analysis")
+    assert alias_res.status_code == 200
+    alias_body = alias_res.json()
 
     assert body["failure_id"] == str(failure_id)
     assert body["repo"] == "acme/widgets"
+    assert alias_body["failure_id"] == body["failure_id"]
+    assert alias_body["summary"] == body["summary"]
     assert "summary" in body and "confidence" in body["summary"]
     assert isinstance(body.get("evidence"), list)
     assert body["proposed_fix"]["diff_available"] is True
@@ -204,3 +213,64 @@ def test_run_diff_and_timeline_and_artifact_endpoints(monkeypatch: pytest.Monkey
     artifact_res = client.get(f"/api/v1/runs/{run_id}/artifact")
     assert artifact_res.status_code == 200
     assert artifact_res.json()["run_id"] == str(run_id)
+
+
+def test_consensus_endpoints_return_persisted_artifact(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = _authed_client()
+    run_id = uuid4()
+    failure_id = uuid4()
+    run = DummyRun(
+        id=run_id,
+        event_id=failure_id,
+        status="plan_ready",
+        created_at=datetime.now(UTC),
+        updated_at=None,
+        issue_graph_json={
+            "issues": [
+                {
+                    "issue_id": "error_0",
+                    "message": "Import error",
+                    "severity": "error",
+                    "file_paths": ["src/app.py"],
+                    "evidence_refs": ["ImportError"],
+                }
+            ],
+            "affected_files": ["src/app.py"],
+            "severity_levels": {"error": 1},
+            "dependency_links": [],
+        },
+        consensus_json={
+            "state": "accepted",
+            "agreement_rate": 1.0,
+            "selected_agent": "planner",
+            "selected_plan": None,
+            "candidates": [],
+            "rejections": [],
+            "metadata": {"candidate_count": 3},
+        },
+        consensus_shadow_diff_json={"mode": "dual_run", "same_as_executed": True},
+        consensus_state="accepted",
+    )
+
+    async def _fake_get_run(self, rid: UUID):
+        assert rid == run_id
+        return run
+
+    async def _fake_get_run_by_event_id(self, event_id: UUID):
+        assert event_id == failure_id
+        return run
+
+    monkeypatch.setattr("sre_agent.fix_pipeline.store.FixPipelineRunStore.get_run", _fake_get_run)
+    monkeypatch.setattr(
+        "sre_agent.fix_pipeline.store.FixPipelineRunStore.get_run_by_event_id",
+        _fake_get_run_by_event_id,
+    )
+
+    by_run_res = client.get(f"/api/v1/runs/{run_id}/consensus")
+    assert by_run_res.status_code == 200
+    assert by_run_res.json()["consensus_state"] == "accepted"
+    assert by_run_res.json()["run_id"] == str(run_id)
+
+    by_failure_res = client.get(f"/api/v1/failures/{failure_id}/consensus")
+    assert by_failure_res.status_code == 200
+    assert by_failure_res.json()["failure_id"] == str(failure_id)

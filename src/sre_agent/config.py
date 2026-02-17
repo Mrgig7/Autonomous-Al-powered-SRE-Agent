@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     base_backoff_seconds: int = 30
     max_backoff_seconds: int = 600
     cooldown_seconds: int = 900
+    retry_signature_ttl_seconds: int = 86400
 
     # LLM Configuration
     llm_provider: Literal["ollama", "mock"] = "ollama"
@@ -137,11 +138,39 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
+    jwt_access_cookie_name: str = "sre_access_token"
+    jwt_refresh_cookie_name: str = "sre_refresh_token"
+    auth_cookie_samesite: Literal["lax", "strict", "none"] = "lax"
+    auth_cookie_secure: bool = False
 
     # GitHub OAuth
     github_oauth_client_id: str = ""
     github_oauth_client_secret: str = ""
-    github_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/oauth/github/callback"
+    github_oauth_redirect_uri: str = "http://localhost:3000/oauth/github/callback"
+    github_oauth_token_ttl_seconds: int = 3600
+    github_oauth_state_ttl_seconds: int = 600
+    github_oauth_required_scopes: str = "repo,read:user,workflow"
+
+    # GitHub App (Phase 1 onboarding)
+    github_app_install_url: str = ""
+    phase1_install_state_ttl_seconds: int = 1800
+    phase1_onboarding_state_ttl_seconds: int = 86400
+    phase1_onboarding_rate_limit_per_minute: int = 10
+
+    # Phase 1 feature flags
+    phase1_enable_dashboard: bool = True
+    phase1_enable_install_flow: bool = True
+
+    # Phase 3 controls
+    phase3_critic_max_tokens: int = 900
+    phase3_post_merge_monitor_ttl_seconds: int = 7200
+    phase3_auto_merge_method: Literal["merge", "squash", "rebase"] = "squash"
+
+    # Phase 4 controls (consensus core)
+    phase4_consensus_enabled: bool = True
+    phase4_consensus_mode: Literal["dual_run", "enforced"] = "dual_run"
+    phase4_consensus_min_agreement: float = 0.67
+    phase4_consensus_min_confidence: float = 0.55
 
     # Google OAuth
     google_oauth_client_id: str = ""

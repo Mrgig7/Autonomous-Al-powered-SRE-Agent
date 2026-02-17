@@ -18,10 +18,15 @@ class FixPipelineRunStatus(str, Enum):
     PLAN_READY = "plan_ready"
     PATCH_BLOCKED = "patch_blocked"
     PATCH_READY = "patch_ready"
+    AWAITING_APPROVAL = "awaiting_approval"
     VALIDATION_FAILED = "validation_failed"
     VALIDATION_PASSED = "validation_passed"
     PR_FAILED = "pr_failed"
     PR_CREATED = "pr_created"
+    MERGED = "merged"
+    MERGE_FAILED = "merge_failed"
+    MONITORING = "monitoring"
+    ESCALATED = "escalated"
 
 
 class FixPipelineRun(Base):
@@ -49,6 +54,13 @@ class FixPipelineRun(Base):
     pr_json: Mapped[dict[str, Any] | None] = mapped_column(nullable=True)
     adapter_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     detection_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    critic_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    issue_graph_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    consensus_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    consensus_shadow_diff_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    consensus_state: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    merge_result_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    post_merge_monitor_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     artifact_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     sbom_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     sbom_sha256: Mapped[str | None] = mapped_column(String(128), nullable=True)
@@ -56,6 +68,9 @@ class FixPipelineRun(Base):
 
     run_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     attempt_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    retry_limit_snapshot: Mapped[int] = mapped_column(nullable=False, default=3)
+    automation_mode: Mapped[str] = mapped_column(String(32), nullable=False, default="auto_pr")
+    manual_review_required: Mapped[bool] = mapped_column(nullable=False, default=False)
     blocked_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_pr_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_pr_created_at: Mapped[datetime | None] = mapped_column(
