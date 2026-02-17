@@ -30,7 +30,9 @@ def upgrade() -> None:
     )
     op.add_column(
         "fix_pipeline_runs",
-        sa.Column("consensus_shadow_diff_json", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column(
+            "consensus_shadow_diff_json", postgresql.JSONB(astext_type=sa.Text()), nullable=True
+        ),
     )
     op.add_column(
         "fix_pipeline_runs",

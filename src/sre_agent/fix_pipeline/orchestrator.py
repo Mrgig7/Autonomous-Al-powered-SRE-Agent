@@ -273,11 +273,16 @@ class FixPipelineOrchestrator:
             issue_graph_idx, issue_graph_started = _step_start("issue_graph")
             issue_graph = build_issue_graph(context=context, rca=rca)
             _step_end(issue_graph_idx, status="ok", started=issue_graph_started)
-            await self.store.update_run(run_id, issue_graph_json=issue_graph.model_dump(mode="json"))
+            await self.store.update_run(
+                run_id, issue_graph_json=issue_graph.model_dump(mode="json")
+            )
             await _emit(
                 "issue_graph",
                 "completed",
-                {"issues": len(issue_graph.issues), "affected_files": len(issue_graph.affected_files)},
+                {
+                    "issues": len(issue_graph.issues),
+                    "affected_files": len(issue_graph.affected_files),
+                },
             )
 
             log_text = (
@@ -471,7 +476,10 @@ class FixPipelineOrchestrator:
                 for candidate in consensus_decision.candidates:
                     outcome = (
                         "rejected"
-                        if any(r.agent_name == candidate.agent_name for r in consensus_decision.rejections)
+                        if any(
+                            r.agent_name == candidate.agent_name
+                            for r in consensus_decision.rejections
+                        )
                         else "accepted"
                     )
                     record_consensus_candidate(agent=candidate.agent_name, outcome=outcome)
@@ -490,7 +498,8 @@ class FixPipelineOrchestrator:
                     "agreement_rate": consensus_decision.agreement_rate,
                     "selected_plan_present": selected_plan is not None,
                     "same_as_executed": (
-                        bool(selected_plan) and selected_plan.model_dump() == plan.model_dump()
+                        selected_plan is not None
+                        and selected_plan.model_dump() == plan.model_dump()
                     ),
                 }
                 await self.store.update_run(
@@ -670,7 +679,9 @@ class FixPipelineOrchestrator:
                 return {"success": False, "error": "patch_apply_failed"}
 
             ast_idx, ast_started = _step_start("ast_guard")
-            ast_result = validate_python_ast(repo_path=Path(repo_path), touched_files=sorted(touched))
+            ast_result = validate_python_ast(
+                repo_path=Path(repo_path), touched_files=sorted(touched)
+            )
             _step_end(
                 ast_idx,
                 status="ok" if ast_result.passed else "fail",
@@ -1002,7 +1013,9 @@ class FixPipelineOrchestrator:
                     branch=event.branch,
                     pr_number=pr_result.pr_number,
                 )
-                await _emit("post_merge", "monitoring", {"repo": event.repo, "branch": event.branch})
+                await _emit(
+                    "post_merge", "monitoring", {"repo": event.repo, "branch": event.branch}
+                )
                 await _emit("pipeline", "completed")
                 return {
                     "success": True,
