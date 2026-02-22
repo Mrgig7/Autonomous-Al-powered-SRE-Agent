@@ -49,9 +49,15 @@ class FailureExecution:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run real-time SRE test harness")
     parser.add_argument("--failures", default="all", help="Comma-separated failure IDs or 'all'")
-    parser.add_argument("--repo-name", default=None, help="Override generated GitHub repository name")
-    parser.add_argument("--dry-run", action="store_true", help="Do not push/trigger, just print plan")
-    parser.add_argument("--cleanup", action="store_true", help="Delete auto-created repository at the end")
+    parser.add_argument(
+        "--repo-name", default=None, help="Override generated GitHub repository name"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Do not push/trigger, just print plan"
+    )
+    parser.add_argument(
+        "--cleanup", action="store_true", help="Delete auto-created repository at the end"
+    )
     return parser.parse_args()
 
 
@@ -163,7 +169,9 @@ class GitHubHarnessClient:
             return
         response.raise_for_status()
 
-    def wait_for_failed_workflow(self, full_name: str, branch: str, timeout_seconds: int = 600) -> dict[str, Any]:
+    def wait_for_failed_workflow(
+        self, full_name: str, branch: str, timeout_seconds: int = 600
+    ) -> dict[str, Any]:
         deadline = time.time() + timeout_seconds
         while time.time() < deadline:
             response = self.client.get(
@@ -176,7 +184,7 @@ class GitHubHarnessClient:
             if runs:
                 run = runs[0]
                 status = run.get("status")
-                conclusion = run.get("conclusion")
+                conclusion = run.get("conclusion")  # noqa: F841
                 if status == "completed":
                     return run
             time.sleep(8)
@@ -197,7 +205,9 @@ def initialize_git_repo(repo_dir: Path) -> str:
     run_cmd(["git", "add", "."], cwd=repo_dir)
     run_cmd(["git", "commit", "-m", "baseline: healthy sample app"], cwd=repo_dir)
     run_cmd(["git", "branch", "-M", "main"], cwd=repo_dir)
-    baseline_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo_dir, text=True).strip()
+    baseline_sha = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo_dir, text=True
+    ).strip()
     return baseline_sha
 
 

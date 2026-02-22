@@ -1,6 +1,8 @@
 """Check GitHub for harness repo and workflow status."""
-import httpx
+
 import os
+
+import httpx
 
 token = os.environ.get("GITHUB_TOKEN", "")
 client = httpx.Client(

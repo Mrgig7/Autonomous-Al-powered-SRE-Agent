@@ -368,4 +368,3 @@ class PRCreator:
                 "status_code": response.status_code,
                 "message": data.get("message") or response.text,
             }
-

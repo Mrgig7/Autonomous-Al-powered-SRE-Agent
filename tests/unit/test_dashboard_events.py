@@ -38,4 +38,3 @@ async def test_publish_dashboard_event_never_raises(monkeypatch: pytest.MonkeyPa
 
     monkeypatch.setattr("sre_agent.services.dashboard_events.get_redis_service", lambda: _Redis())
     await publish_dashboard_event(event_type="pipeline_stage", stage="plan", status="failed")
-

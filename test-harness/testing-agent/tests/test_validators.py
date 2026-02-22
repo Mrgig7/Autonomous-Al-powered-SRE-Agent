@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from validators import event_ingestion, observability, rca_engine
 
 
@@ -31,7 +30,12 @@ sre_agent_policy_violations_total{type="path"} 0
 
 @pytest.mark.asyncio
 async def test_event_ingestion_validator_passes() -> None:
-    ctx = {"failure_id": "failure-uuid", "repository": "org/repo", "branch": "failure-1", "sse_wait_timeout_seconds": 1}
+    ctx = {
+        "failure_id": "failure-uuid",
+        "repository": "org/repo",
+        "branch": "failure-1",
+        "sse_wait_timeout_seconds": 1,
+    }
     result = await event_ingestion.validate(ctx, DummyClient())
     assert result.passed is True
 
@@ -49,4 +53,3 @@ async def test_observability_validator_uses_alias_mapping() -> None:
     ctx = {}
     result = await observability.validate(ctx, DummyClient())
     assert result.passed is True
-

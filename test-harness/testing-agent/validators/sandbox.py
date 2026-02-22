@@ -39,4 +39,3 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
             duration_seconds=time.perf_counter() - started,
             error=str(exc),
         )
-

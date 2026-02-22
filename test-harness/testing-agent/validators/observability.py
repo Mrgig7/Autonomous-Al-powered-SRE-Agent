@@ -6,7 +6,6 @@ from typing import Any
 
 from reporter import ValidatorOutcome
 
-
 METRIC_ALIASES = {
     "failure_count": "sre_agent_pipeline_runs_total",
     "fix_attempts": "sre_agent_pipeline_retry_total",
@@ -32,7 +31,12 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
         metrics_payload = await sre_client.get_metrics()
         metric_names = _extract_metric_names(metrics_payload)
 
-        required_aliases = ["failure_count", "fix_attempts", "sandbox_success_rate", "policy_rejections"]
+        required_aliases = [
+            "failure_count",
+            "fix_attempts",
+            "sandbox_success_rate",
+            "policy_rejections",
+        ]
         required_metrics = [METRIC_ALIASES[item] for item in required_aliases]
         missing = [name for name in required_metrics if name not in metric_names]
 
@@ -55,4 +59,3 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
             duration_seconds=time.perf_counter() - started,
             error=str(exc),
         )
-

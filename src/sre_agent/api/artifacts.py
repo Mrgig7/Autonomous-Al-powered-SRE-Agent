@@ -73,9 +73,7 @@ async def get_run_timeline(
 @router.post("/{run_id}/approve-pr")
 async def approve_run_pr(
     run_id: UUID,
-    user: TokenPayload = Depends(
-        require_permission(Permission.APPROVE_FIX, Permission.CREATE_PR)
-    ),
+    user: TokenPayload = Depends(require_permission(Permission.APPROVE_FIX, Permission.CREATE_PR)),
 ) -> dict:
     """Approve an awaiting run and enqueue PR creation."""
     store = FixPipelineRunStore()

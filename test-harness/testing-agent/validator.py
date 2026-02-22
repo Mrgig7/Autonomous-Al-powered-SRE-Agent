@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 from api_client import SREApiClient
-from config import load_settings
 from reporter import HarnessReport, ValidatorOutcome, render_console, write_json
 from validators import (
     event_ingestion,
@@ -18,6 +17,7 @@ from validators import (
     security_safety,
 )
 
+from config import load_settings
 
 VALIDATORS = [
     event_ingestion.validate,
@@ -122,4 +122,3 @@ async def run() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(asyncio.run(run()))
-

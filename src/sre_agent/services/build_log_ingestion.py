@@ -32,7 +32,9 @@ class BuildLogIngestionService:
     def __init__(self, *, max_log_size_mb: int = 10) -> None:
         self.max_log_size_bytes = max(1, int(max_log_size_mb)) * 1024 * 1024
 
-    async def ingest(self, *, client: GitHubClient, event: PipelineEvent) -> IngestedBuildLog | None:
+    async def ingest(
+        self, *, client: GitHubClient, event: PipelineEvent
+    ) -> IngestedBuildLog | None:
         """Fetch logs for an event by preferring job logs, then run logs."""
         try:
             raw_content, source = await self._fetch_content(client=client, event=event)
@@ -72,7 +74,9 @@ class BuildLogIngestionService:
             source=source,
         )
 
-    async def _fetch_content(self, *, client: GitHubClient, event: PipelineEvent) -> tuple[str, str]:
+    async def _fetch_content(
+        self, *, client: GitHubClient, event: PipelineEvent
+    ) -> tuple[str, str]:
         raw_payload = event.raw_payload if isinstance(event.raw_payload, dict) else {}
         job_id = self._extract_job_id(raw_payload)
         if job_id is not None:

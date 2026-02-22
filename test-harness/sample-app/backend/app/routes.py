@@ -62,4 +62,3 @@ async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)) -> None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
     await db.delete(task)
     await db.commit()
-

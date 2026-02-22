@@ -234,9 +234,7 @@ class GitHubEventNormalizer:
         repo = parsed.repository
 
         # Generate idempotency key for workflow_run
-        idempotency_key = (
-            f"github_actions_run:{repo.full_name}:{run.id}:{run.run_attempt}"
-        )
+        idempotency_key = f"github_actions_run:{repo.full_name}:{run.id}:{run.run_attempt}"
 
         # Infer failure type from workflow name
         workflow_name = run.name or "unknown"

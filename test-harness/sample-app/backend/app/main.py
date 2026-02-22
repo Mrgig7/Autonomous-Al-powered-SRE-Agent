@@ -35,4 +35,3 @@ async def health() -> dict[str, str]:
 
 
 app.include_router(tasks_router, prefix=settings.api_prefix)
-

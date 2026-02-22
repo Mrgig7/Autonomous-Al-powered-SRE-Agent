@@ -103,4 +103,3 @@ def inject_failure(sample_root: Path, failure_id: int) -> str:
         return "Invalid GitHub Action step injected"
 
     raise FailureInjectionError(f"Unknown failure id: {failure_id}")
-

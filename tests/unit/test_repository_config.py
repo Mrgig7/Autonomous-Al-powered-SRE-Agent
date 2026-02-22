@@ -120,12 +120,7 @@ def test_repository_config_invalid_values_are_safely_normalized(
     service = RepositoryConfigService()
 
     async def _file(**_kwargs) -> str | None:
-        return (
-            "automation_mode: nonsense\n"
-            "protected_paths:\n"
-            "  - api/**\n"
-            "retry_limit: 99\n"
-        )
+        return "automation_mode: nonsense\n" "protected_paths:\n" "  - api/**\n" "retry_limit: 99\n"
 
     monkeypatch.setattr(service, "_fetch_config_file", _file)
 

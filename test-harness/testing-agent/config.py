@@ -25,4 +25,3 @@ class HarnessSettings(BaseSettings):
 
 def load_settings() -> HarnessSettings:
     return HarnessSettings()
-

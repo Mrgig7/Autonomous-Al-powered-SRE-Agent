@@ -29,7 +29,9 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
             error="Missing run_id for PR validation",
         )
 
-    owner = repository.split("/")[0] if "/" in repository else str(context.get("github_owner") or "")
+    owner = (
+        repository.split("/")[0] if "/" in repository else str(context.get("github_owner") or "")
+    )
     branch = f"sre-fix/{run_id[:12].replace('-', '')}"
 
     client = GitHubApiClient(base_url=github_api_base_url, token=token)
@@ -92,4 +94,3 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
         )
     finally:
         await client.close()
-

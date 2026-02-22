@@ -29,7 +29,9 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
 
         has_plan = isinstance(plan, dict) and len(plan) > 0
         has_diff = isinstance(diff_text, str) and diff_text.startswith("--- a/")
-        has_policy = safety.get("patch_policy") is not None or safety.get("danger_score") is not None
+        has_policy = (
+            safety.get("patch_policy") is not None or safety.get("danger_score") is not None
+        )
         has_timeline = isinstance(timeline.get("timeline"), list) and len(timeline["timeline"]) > 0
 
         passed = all([has_plan, has_diff, has_policy, has_timeline, bool(artifact.get("run_id"))])
@@ -52,4 +54,3 @@ async def validate(context: dict[str, Any], sre_client) -> ValidatorOutcome:
             duration_seconds=time.perf_counter() - started,
             error=str(exc),
         )
-

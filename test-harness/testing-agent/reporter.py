@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
+
 try:
     from rich.console import Console
     from rich.table import Table

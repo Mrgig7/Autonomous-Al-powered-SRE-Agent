@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 
 
 @dataclass
@@ -15,4 +15,3 @@ def load_config() -> RuntimeConfig:
         environment=os.getenv("ENVIRONMENT", "dev"),
         api_base_url=os.getenv("API_BASE_URL", "http://localhost:8001/api/v1"),
     )
-

@@ -5,9 +5,11 @@ Revises:
 Create Date: 2026-02-11 12:00:00.000000
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
+from typing import Union
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -31,4 +33,3 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("tasks")
-

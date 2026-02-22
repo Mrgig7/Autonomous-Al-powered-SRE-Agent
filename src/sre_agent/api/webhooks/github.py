@@ -236,7 +236,10 @@ async def github_webhook(
         )
 
     payload_installation_id = _extract_installation_id(payload)
-    if payload_installation_id is not None and installation.installation_id != payload_installation_id:
+    if (
+        payload_installation_id is not None
+        and installation.installation_id != payload_installation_id
+    ):
         return WebhookResponse(
             status="ignored",
             message="Repository installation_id mismatch; webhook ignored",

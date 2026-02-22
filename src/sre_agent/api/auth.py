@@ -301,7 +301,9 @@ async def _complete_github_oauth(
     settings = get_settings()
     state_store = OAuthStateStore()
 
-    logger.info(f"GitHub OAuth exchange: state={callback_request.state[:12]}... code={callback_request.code[:8]}...")
+    logger.info(
+        f"GitHub OAuth exchange: state={callback_request.state[:12]}... code={callback_request.code[:8]}..."
+    )
 
     try:
         await state_store.validate_and_consume(provider="github", state=callback_request.state)
@@ -325,7 +327,9 @@ async def _complete_github_oauth(
         access_token = await provider.exchange_code(callback_request.code)
         logger.info("GitHub OAuth: token exchange succeeded, fetching user info...")
         user_info = await provider.get_user_info(access_token)
-        logger.info(f"GitHub OAuth: user info retrieved: email={user_info.email}, scopes={user_info.granted_scopes}")
+        logger.info(
+            f"GitHub OAuth: user info retrieved: email={user_info.email}, scopes={user_info.granted_scopes}"
+        )
 
         required_scopes = _parse_required_scopes(settings.github_oauth_required_scopes)
         granted_scopes = set(user_info.granted_scopes or [])
@@ -335,10 +339,7 @@ async def _complete_github_oauth(
             record_oauth_login_failure(provider="github", reason="missing_scope")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=(
-                    "Missing required GitHub scopes: "
-                    + ", ".join(missing_scopes)
-                ),
+                detail=("Missing required GitHub scopes: " + ", ".join(missing_scopes)),
             )
 
     except OAuthError as exc:
@@ -477,7 +478,9 @@ async def refresh_token(
     settings = get_settings()
     jwt_handler = get_jwt_handler()
 
-    refresh_token_value = request.refresh_token or http_request.cookies.get(settings.jwt_refresh_cookie_name)
+    refresh_token_value = request.refresh_token or http_request.cookies.get(
+        settings.jwt_refresh_cookie_name
+    )
     if not refresh_token_value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -595,7 +598,9 @@ async def oauth_github_init(response: Response) -> OAuthInitResponse:
 @router.post(
     "/github/login",
     summary="GitHub login wrapper endpoint",
-    dependencies=[Depends(limit_by_ip(key_prefix="phase1:github_login", limit=10, window_seconds=60))],
+    dependencies=[
+        Depends(limit_by_ip(key_prefix="phase1:github_login", limit=10, window_seconds=60))
+    ],
 )
 async def github_login(
     request: GitHubLoginRequest,
