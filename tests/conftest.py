@@ -1,6 +1,5 @@
 """Test configuration and fixtures."""
 
-import asyncio
 from collections.abc import Generator
 from typing import Any
 from unittest.mock import MagicMock
@@ -13,14 +12,6 @@ from sre_agent.main import create_app
 # Use in-memory SQLite for tests (requires aiosqlite)
 # For full PostgreSQL tests, use testcontainers
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-
-
-@pytest.fixture(scope="session")
-def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-    """Create event loop for async tests."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture

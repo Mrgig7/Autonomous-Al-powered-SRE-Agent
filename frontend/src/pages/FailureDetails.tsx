@@ -133,7 +133,7 @@ export default function FailureDetails() {
     return (
       <div className="page">
         <div className="error-message">{error || 'Not found'}</div>
-        <Link to="/" className="link">Back to dashboard</Link>
+        <Link to="/app" className="link">Back to dashboard</Link>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function FailureDetails() {
           </div>
         </div>
         <div className="header-actions">
-          <Link to="/events" className="link">Back</Link>
+          <Link to="/app/events" className="link">Back</Link>
           <button className="btn" onClick={downloadArtifact}>Download JSON</button>
         </div>
       </div>

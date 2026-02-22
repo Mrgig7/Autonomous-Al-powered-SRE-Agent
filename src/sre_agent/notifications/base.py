@@ -8,7 +8,7 @@ all notification channels.
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, Optional
 from uuid import UUID, uuid4
@@ -76,7 +76,7 @@ class NotificationPayload:
 
     # Internal tracking
     notification_id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Channel routing hints
     channels: list[str] = field(default_factory=list)  # Empty = all enabled
@@ -117,7 +117,7 @@ class NotificationResult:
     error: Optional[str] = None
     retry_after: Optional[int] = None  # Seconds to wait before retry
     response_data: Optional[dict[str, Any]] = None
-    sent_at: datetime = field(default_factory=datetime.utcnow)
+    sent_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary for logging/storage."""

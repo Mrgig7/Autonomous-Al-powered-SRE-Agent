@@ -15,7 +15,7 @@ import hmac
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, Optional
 
@@ -66,7 +66,7 @@ class FetchedLogs:
     job_id: str
     content: str
     truncated: bool = False
-    fetched_at: datetime = field(default_factory=datetime.utcnow)
+    fetched_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class BaseCIProvider(ABC):

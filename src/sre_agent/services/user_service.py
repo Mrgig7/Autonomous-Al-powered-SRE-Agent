@@ -9,7 +9,7 @@ This module provides CRUD operations for users with:
 
 import logging
 import secrets
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -495,7 +495,7 @@ class UserService:
             role_counts[role.value] = result.scalar_one()
 
         # Recent logins (last 24h)
-        yesterday = datetime.utcnow().replace(hour=0, minute=0, second=0)
+        yesterday = datetime.now(UTC).replace(hour=0, minute=0, second=0)
         recent_result = await self.session.execute(
             select(func.count(User.id)).where(User.last_login_at >= yesterday)
         )
@@ -659,7 +659,7 @@ class UserService:
             return None
 
         # Update last login
-        user.last_login_at = datetime.utcnow()
+        user.last_login_at = datetime.now(UTC)
         await self.session.commit()
 
         self._audit.log(
@@ -681,6 +681,6 @@ class UserService:
             user_id: User who logged in
         """
         await self.session.execute(
-            update(User).where(User.id == user_id).values(last_login_at=datetime.utcnow())
+            update(User).where(User.id == user_id).values(last_login_at=datetime.now(UTC))
         )
         await self.session.commit()

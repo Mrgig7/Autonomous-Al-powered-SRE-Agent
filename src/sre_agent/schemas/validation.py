@@ -1,6 +1,6 @@
 """Schemas for sandbox validation results."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID
 
@@ -148,7 +148,7 @@ class ValidationResult(BaseModel):
     )
     docker_image: str | None = Field(None, description="Docker image used")
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
         description="When validation started",
     )
     completed_at: datetime | None = Field(

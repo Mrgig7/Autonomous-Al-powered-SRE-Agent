@@ -14,20 +14,23 @@ Optimized for high-traffic with:
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sre_agent.api.response_envelope import success_response
 from sre_agent.auth.jwt_handler import TokenPayload
 from sre_agent.auth.permissions import get_current_user, require_permission
 from sre_agent.auth.rbac import Permission
-from sre_agent.database import get_async_session
+from sre_agent.config import get_settings
+from sre_agent.database import get_db_session
 from sre_agent.models.events import EventStatus, PipelineEvent
+from sre_agent.services.onboarding_state import OnboardingStateService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -138,18 +141,30 @@ async def get_cached_or_compute(
 
 @router.get(
     "/overview",
-    response_model=DashboardOverview,
+    response_model=dict[str, Any],
     summary="Get dashboard overview",
     dependencies=[Depends(require_permission(Permission.VIEW_DASHBOARD))],
 )
 async def get_overview(
     current_user: TokenPayload = Depends(get_current_user),
-    session: AsyncSession = Depends(get_async_session),
-) -> DashboardOverview:
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
     """Get complete dashboard overview with stats and recent activity."""
+    settings = get_settings()
+    if not settings.phase1_enable_dashboard:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Phase 1 dashboard is disabled",
+        )
+
+    onboarding_state = OnboardingStateService()
+    await onboarding_state.update_state(
+        user_id=current_user.user_id,
+        dashboard_ready=True,
+    )
 
     async def compute():
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         yesterday = now - timedelta(days=1)
 
         # Get overview stats
@@ -212,7 +227,7 @@ async def get_overview(
         ttl=30,  # 30 second cache
     )
 
-    return DashboardOverview(**data)
+    return success_response(DashboardOverview(**data).model_dump())
 
 
 @router.get(
@@ -229,7 +244,7 @@ async def get_events(
     end_date: Optional[datetime] = None,
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_db_session),
 ) -> PaginatedEventsResponse:
     """Get paginated pipeline events with filtering."""
     query = select(PipelineEvent)
@@ -292,13 +307,13 @@ async def get_events(
 async def get_trends(
     days: int = Query(7, ge=1, le=90),
     repository: Optional[str] = None,
-    session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_db_session),
 ) -> list[TrendPoint]:
     """Get daily event trends for charts."""
     cache_key = f"dashboard:trends:{days}:{repository or 'all'}"
 
     async def compute():
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         start_date = now - timedelta(days=days)
 
         # Group by date
@@ -348,7 +363,7 @@ async def get_trends(
 )
 async def get_repo_stats(
     limit: int = Query(20, ge=1, le=100),
-    session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_db_session),
 ) -> list[RepoStats]:
     """Get statistics grouped by repository."""
     cache_key = f"dashboard:repos:{limit}"
@@ -407,7 +422,7 @@ async def get_system_health() -> dict[str, Any]:
 
     health = {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "components": {},
     }
 
@@ -480,7 +495,7 @@ async def stream_events(
             await redis.subscribe("dashboard_events", handler)
 
             # Send initial connection event
-            yield f"data: {json.dumps({'type': 'connected', 'timestamp': datetime.utcnow().isoformat()})}\n\n"
+            yield f"data: {json.dumps({'type': 'connected', 'timestamp': datetime.now(UTC).isoformat()})}\n\n"
 
             # Stream events
             while True:
@@ -496,7 +511,7 @@ async def stream_events(
                     yield f"data: {json.dumps(event)}\n\n"
                 except asyncio.TimeoutError:
                     # Send heartbeat
-                    yield f"data: {json.dumps({'type': 'heartbeat', 'timestamp': datetime.utcnow().isoformat()})}\n\n"
+                    yield f"data: {json.dumps({'type': 'heartbeat', 'timestamp': datetime.now(UTC).isoformat()})}\n\n"
 
         except asyncio.CancelledError:
             pass

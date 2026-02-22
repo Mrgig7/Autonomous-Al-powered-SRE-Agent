@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from sre_agent.core.security import get_verified_github_payload
 from sre_agent.database import get_db_session
 from sre_agent.main import create_app
+from sre_agent.schemas.repository_config import RepositoryRuntimeConfig
 
 
 def _client_with_overrides(payload: dict, delivery_id: str, *, event_type: str = "workflow_job"):
@@ -45,9 +46,37 @@ def test_github_webhook_duplicate_delivery_is_ignored(monkeypatch: pytest.Monkey
     async def _record_delivery(self, **_kwargs):
         return False
 
+    async def _get_installation(self, *, repo_full_name: str):
+        return type(
+            "Install",
+            (),
+            {
+                "installation_id": 999,
+                "repo_full_name": repo_full_name,
+                "user_id": uuid4(),
+                "automation_mode": "suggest",
+            },
+        )()
+
+    async def _resolve_repo_config(self, **_kwargs):
+        return RepositoryRuntimeConfig(
+            automation_mode="suggest",
+            protected_paths=[],
+            retry_limit=3,
+            source="installation_default",
+        )
+
     monkeypatch.setattr(
         "sre_agent.services.webhook_delivery_store.WebhookDeliveryStore.record_delivery",
         _record_delivery,
+    )
+    monkeypatch.setattr(
+        "sre_agent.services.github_app_installations.GitHubAppInstallationService.get_by_repo_full_name",
+        _get_installation,
+    )
+    monkeypatch.setattr(
+        "sre_agent.services.repository_config.RepositoryConfigService.resolve_for_repository",
+        _resolve_repo_config,
     )
 
     res = client.post("/webhooks/github")
@@ -67,7 +96,7 @@ def test_github_webhook_throttle_delays_enqueue(monkeypatch: pytest.MonkeyPatch)
     async def _record_delivery(self, **_kwargs):
         return True
 
-    def _normalize(self, payload, correlation_id):
+    def _normalize(self, payload, correlation_id, event_type="workflow_job"):
         return type(
             "E",
             (),
@@ -83,6 +112,26 @@ def test_github_webhook_throttle_delays_enqueue(monkeypatch: pytest.MonkeyPatch)
 
     async def _update_status(self, *_args, **_kwargs):
         return None
+
+    async def _get_installation(self, *, repo_full_name: str):
+        return type(
+            "Install",
+            (),
+            {
+                "installation_id": 999,
+                "repo_full_name": repo_full_name,
+                "user_id": uuid4(),
+                "automation_mode": "suggest",
+            },
+        )()
+
+    async def _resolve_repo_config(self, **_kwargs):
+        return RepositoryRuntimeConfig(
+            automation_mode="suggest",
+            protected_paths=[],
+            retry_limit=3,
+            source="installation_default",
+        )
 
     scheduled = {}
 
@@ -101,6 +150,14 @@ def test_github_webhook_throttle_delays_enqueue(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(
         "sre_agent.services.event_normalizer.GitHubEventNormalizer.normalize",
         _normalize,
+    )
+    monkeypatch.setattr(
+        "sre_agent.services.github_app_installations.GitHubAppInstallationService.get_by_repo_full_name",
+        _get_installation,
+    )
+    monkeypatch.setattr(
+        "sre_agent.services.repository_config.RepositoryConfigService.resolve_for_repository",
+        _resolve_repo_config,
     )
     monkeypatch.setattr("sre_agent.services.event_store.EventStore.store_event", _store_event)
     monkeypatch.setattr("sre_agent.services.event_store.EventStore.update_status", _update_status)

@@ -5,7 +5,7 @@ Coordinates sandbox creation, patching, testing, and result collection.
 
 import logging
 import time
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -308,7 +308,7 @@ class ValidationOrchestrator:
 
             result.steps_completed = steps
             result.execution_time_seconds = time.time() - start_time
-            result.completed_at = datetime.utcnow()
+            result.completed_at = datetime.now(UTC)
 
         logger.info(
             "Validation complete",

@@ -4,7 +4,7 @@ Stores resolved incidents in the database for future reference.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -133,7 +133,7 @@ class IncidentStore:
             incident_id,
             status=IncidentStatus.MERGED,
             pr_merged=pr_merged,
-            resolved_at=datetime.utcnow(),
+            resolved_at=datetime.now(UTC),
             resolved_by="auto",
         )
 
@@ -147,7 +147,7 @@ class IncidentStore:
             incident_id,
             status=IncidentStatus.FAILED,
             resolution=resolution,
-            resolved_at=datetime.utcnow(),
+            resolved_at=datetime.now(UTC),
         )
 
     async def list_incidents(

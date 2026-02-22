@@ -149,7 +149,7 @@ class Settings(BaseSettings):
     github_oauth_redirect_uri: str = "http://localhost:3000/oauth/github/callback"
     github_oauth_token_ttl_seconds: int = 3600
     github_oauth_state_ttl_seconds: int = 600
-    github_oauth_required_scopes: str = "repo,read:user,workflow"
+    github_oauth_required_scopes: str = "repo,read:user,user:email,workflow"
 
     # GitHub App (Phase 1 onboarding)
     github_app_install_url: str = ""

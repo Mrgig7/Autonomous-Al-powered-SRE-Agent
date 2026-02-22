@@ -27,6 +27,7 @@ class OAuthUserInfo:
     name: Optional[str] = None
     avatar_url: Optional[str] = None
     access_token: Optional[str] = None
+    granted_scopes: Optional[list[str]] = None
     raw_data: Optional[dict[str, Any]] = None
 
 
@@ -52,7 +53,7 @@ class GitHubOAuthProvider:
         client_id: str,
         client_secret: str,
         redirect_uri: str,
-        scope: str = "read:user user:email",
+        scope: str = "repo read:user workflow user:email",
     ):
         """Initialize GitHub OAuth provider.
 
@@ -153,6 +154,7 @@ class GitHubOAuthProvider:
             raise OAuthError(f"Failed to get user info: {response.text}")
 
         user_data = response.json()
+        granted_scopes = self._parse_scopes(response.headers.get("X-OAuth-Scopes"))
 
         # Get primary email if not in profile
         email = user_data.get("email")
@@ -176,8 +178,16 @@ class GitHubOAuthProvider:
             name=user_data.get("name") or user_data.get("login"),
             avatar_url=user_data.get("avatar_url"),
             access_token=access_token,
+            granted_scopes=sorted(granted_scopes),
             raw_data=user_data,
         )
+
+    @staticmethod
+    def _parse_scopes(scope_header: str | None) -> set[str]:
+        if not scope_header:
+            return set()
+        chunks = [part.strip() for part in scope_header.replace(" ", ",").split(",")]
+        return {chunk for chunk in chunks if chunk}
 
     async def close(self):
         if self._client:

@@ -5,6 +5,7 @@ from typing import Any
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from sre_agent.schemas.repository_config import RepositoryRuntimeConfig
 
 
 class TestGitHubWebhookEndpoint:
@@ -104,8 +105,18 @@ class TestGitHubWebhookEndpoint:
 
     @patch("sre_agent.api.webhooks.github.EventStore")
     @patch("sre_agent.api.webhooks.github.process_pipeline_event")
+    @patch("sre_agent.services.webhook_delivery_store.WebhookDeliveryStore.record_delivery")
+    @patch(
+        "sre_agent.services.repository_config.RepositoryConfigService.resolve_for_repository",
+    )
+    @patch(
+        "sre_agent.services.github_app_installations.GitHubAppInstallationService.get_by_repo_full_name",
+    )
     def test_failed_job_is_accepted(
         self,
+        mock_get_installation: Any,
+        mock_resolve_config: Any,
+        mock_record_delivery: Any,
         mock_task: Any,
         mock_store_class: Any,
         client: TestClient,
@@ -122,6 +133,19 @@ class TestGitHubWebhookEndpoint:
         mock_store.store_event.return_value = (mock_event, True)
         mock_store.update_status = AsyncMock()
         mock_store_class.return_value = mock_store
+        mock_record_delivery.return_value = True
+        mock_get_installation.return_value = MagicMock(
+            installation_id=999,
+            repo_full_name="test-org/test-repo",
+            user_id=uuid4(),
+            automation_mode="suggest",
+        )
+        mock_resolve_config.return_value = RepositoryRuntimeConfig(
+            automation_mode="suggest",
+            protected_paths=[],
+            retry_limit=3,
+            source="installation_default",
+        )
 
         # Mock Celery task
         mock_task.delay = MagicMock()

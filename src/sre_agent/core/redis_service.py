@@ -19,7 +19,7 @@ import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -113,11 +113,11 @@ class RedisService:
         self._subscriber_tasks.clear()
 
         if self._pubsub:
-            await self._pubsub.close()
+            await self._pubsub.aclose()
             self._pubsub = None
 
         if self._client:
-            await self._client.close()
+            await self._client.aclose()
             self._client = None
 
         if self._pool:
@@ -172,7 +172,7 @@ class RedisService:
                 "jti": jti,
                 "user_id": str(user_id) if user_id else None,
                 "reason": reason,
-                "blocked_at": datetime.utcnow().isoformat(),
+                "blocked_at": datetime.now(UTC).isoformat(),
             }
 
             await client.setex(key, ttl, json.dumps(data))
@@ -218,7 +218,7 @@ class RedisService:
 
             data = {
                 "user_id": str(user_id),
-                "revoked_at": datetime.utcnow().isoformat(),
+                "revoked_at": datetime.now(UTC).isoformat(),
                 "reason": reason,
             }
 
@@ -433,6 +433,23 @@ class RedisService:
                 "Redis dedup mark unavailable; skipping",
                 extra={"operation": operation, "error": str(e)},
             )
+
+    async def increment_counter(self, key: str, ttl_seconds: int) -> int:
+        """Atomically increment a counter and apply/refresh TTL."""
+        redis_key = self._key("counter", key)
+        try:
+            async with self.get_client() as client:
+                async with client.pipeline(transaction=True) as pipe:
+                    pipe.incr(redis_key)
+                    pipe.expire(redis_key, int(ttl_seconds))
+                    results = await pipe.execute()
+                return int(results[0] or 0)
+        except Exception as e:
+            logger.warning(
+                "Redis counter increment unavailable; returning conservative fallback",
+                extra={"key": key, "error": str(e)},
+            )
+            return 1
 
     @staticmethod
     def hash_payload(payload: dict[str, Any]) -> str:

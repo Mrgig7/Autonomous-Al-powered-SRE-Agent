@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -264,6 +264,6 @@ async def build_failure_explain_payload(*, failure_id: UUID) -> dict[str, Any] |
         "timeline": redactor.redact_obj(
             build_timeline_from_artifact(run.artifact_json if run else None)
         ),
-        "generated_at": datetime.utcnow().isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
     }
     return payload

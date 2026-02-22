@@ -11,7 +11,7 @@ handling:
 import asyncio
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
@@ -293,7 +293,7 @@ class NotificationManager:
         if not self.config.rate_limit_enabled:
             return True
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         window_start = now - timedelta(seconds=self.config.rate_limit_window_seconds)
 
         # Clean old entries
@@ -325,7 +325,7 @@ class NotificationManager:
             notification_id=payload.notification_id,
             payload=payload,
             results=results,
-            sent_at=datetime.utcnow(),
+            sent_at=datetime.now(UTC),
             overall_success=overall_success,
         )
 

@@ -80,6 +80,7 @@ Phase 6 surfaces an evidence-backed view of a pipeline run by exposing **only pe
 
 ### API Endpoints
 
+- `GET /api/v1/failures/{failure_id}/analysis`
 - `GET /api/v1/failures/{failure_id}/explain`
 - `GET /api/v1/runs/{run_id}/artifact`
 - `GET /api/v1/runs/{run_id}/diff`

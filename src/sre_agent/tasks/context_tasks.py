@@ -9,6 +9,7 @@ import logging
 from celery import Task
 
 from sre_agent.celery_app import celery_app
+from sre_agent.services.dashboard_events import publish_dashboard_event
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +166,15 @@ async def _build_context_async(
         # Update status to processing
         event.status = EventStatus.PROCESSING.value
         await session.commit()
+        await publish_dashboard_event(
+            event_type="pipeline_stage",
+            stage="context",
+            status="running",
+            failure_id=event_id,
+            run_id=None,
+            correlation_id=correlation_id,
+            metadata={"repo": event.repo},
+        )
 
         # Build context
         builder = ContextBuilder()
@@ -184,6 +194,17 @@ async def _build_context_async(
                 "changed_files": len(context.changed_files),
             },
         )
+        await publish_dashboard_event(
+            event_type="pipeline_stage",
+            stage="context",
+            status="completed",
+            failure_id=event_id,
+            correlation_id=correlation_id,
+            metadata={
+                "errors": len(context.errors),
+                "test_failures": len(context.test_failures),
+            },
+        )
 
         # Run RCA analysis
         from sre_agent.intelligence.rca_engine import RCAEngine
@@ -198,6 +219,17 @@ async def _build_context_async(
                 "category": rca_result.classification.category.value,
                 "confidence": rca_result.classification.confidence,
                 "hypothesis": rca_result.primary_hypothesis.description[:100],
+            },
+        )
+        await publish_dashboard_event(
+            event_type="pipeline_stage",
+            stage="rca",
+            status="completed",
+            failure_id=event_id,
+            correlation_id=correlation_id,
+            metadata={
+                "category": rca_result.classification.category.value,
+                "confidence": rca_result.classification.confidence,
             },
         )
 
@@ -216,6 +248,14 @@ async def _build_context_async(
         run_fix_pipeline.apply_async(
             kwargs={"run_id": str(run_id), "correlation_id": correlation_id},
             headers=inject_trace_headers(),
+        )
+        await publish_dashboard_event(
+            event_type="pipeline_stage",
+            stage="fix_pipeline",
+            status="queued",
+            failure_id=event_id,
+            run_id=str(run_id),
+            correlation_id=correlation_id,
         )
 
         # Mark as completed

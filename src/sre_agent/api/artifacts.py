@@ -6,10 +6,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from sre_agent.artifacts.provenance import ProvenanceArtifact
+from sre_agent.auth.jwt_handler import TokenPayload
 from sre_agent.auth.permissions import Permission, require_permission
 from sre_agent.explainability.redactor import get_redactor
 from sre_agent.fix_pipeline.store import FixPipelineRunStore
+from sre_agent.models.fix_pipeline import FixPipelineRunStatus
+from sre_agent.observability.metrics import record_manual_approval
 from sre_agent.schemas.explainability import RunDiffResponse, RunTimelineResponse, TimelineStepOut
+from sre_agent.tasks.fix_pipeline_tasks import approve_run_and_create_pr
 
 router = APIRouter(prefix="/runs", tags=["Artifacts"])
 
@@ -64,3 +68,36 @@ async def get_run_timeline(
             continue
         parsed.append(TimelineStepOut(**item))
     return RunTimelineResponse(run_id=run_id, timeline=parsed).model_dump(mode="json")
+
+
+@router.post("/{run_id}/approve-pr")
+async def approve_run_pr(
+    run_id: UUID,
+    user: TokenPayload = Depends(
+        require_permission(Permission.APPROVE_FIX, Permission.CREATE_PR)
+    ),
+) -> dict:
+    """Approve an awaiting run and enqueue PR creation."""
+    store = FixPipelineRunStore()
+    run = await store.get_run(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    if run.status != FixPipelineRunStatus.AWAITING_APPROVAL.value:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Run status must be '{FixPipelineRunStatus.AWAITING_APPROVAL.value}'",
+        )
+
+    result = approve_run_and_create_pr.apply_async(
+        kwargs={
+            "run_id": str(run_id),
+            "approved_by": str(user.user_id),
+            "correlation_id": str(user.user_id),
+        }
+    )
+    record_manual_approval(outcome="queued")
+    return {
+        "status": "accepted",
+        "run_id": str(run_id),
+        "task_id": result.id,
+    }

@@ -1,6 +1,6 @@
 """Schemas for failure intelligence and RCA results."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID
 
@@ -134,7 +134,7 @@ class RCAResult(BaseModel):
         description="Time taken for analysis",
     )
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
         description="When this analysis was created",
     )
 

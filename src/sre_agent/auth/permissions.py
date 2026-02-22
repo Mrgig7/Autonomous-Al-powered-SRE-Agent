@@ -7,11 +7,12 @@ enforcing authentication and authorization on endpoints.
 import logging
 from typing import Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from sre_agent.auth.jwt_handler import TokenPayload, get_jwt_handler
 from sre_agent.auth.rbac import Permission, UserRole, get_role_permissions, has_permission
+from sre_agent.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class AuthorizationError(HTTPException):
 
 
 async def get_current_user(
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> TokenPayload:
     """FastAPI dependency to get the current authenticated user.
@@ -54,19 +56,25 @@ async def get_current_user(
     Raises:
         AuthenticationError: If authentication fails
     """
-    if not credentials:
+    settings = get_settings()
+    token = request.cookies.get(settings.jwt_access_cookie_name)
+    if not token and credentials:
+        token = credentials.credentials
+    if not token:
         raise AuthenticationError("No authorization token provided")
 
     jwt_handler = get_jwt_handler()
-    payload = jwt_handler.verify_token(credentials.credentials, token_type="access")
+    payload = jwt_handler.verify_token(token, token_type="access")
 
     if not payload:
         raise AuthenticationError("Invalid or expired token")
 
+    request.state.user = payload
     return payload
 
 
 async def get_current_user_optional(
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> Optional[TokenPayload]:
     """FastAPI dependency to get the current user if authenticated.
@@ -80,12 +88,18 @@ async def get_current_user_optional(
     Returns:
         TokenPayload or None
     """
-    if not credentials:
+    settings = get_settings()
+    token = request.cookies.get(settings.jwt_access_cookie_name)
+    if not token and credentials:
+        token = credentials.credentials
+    if not token:
         return None
 
     try:
         jwt_handler = get_jwt_handler()
-        return jwt_handler.verify_token(credentials.credentials, token_type="access")
+        payload = jwt_handler.verify_token(token, token_type="access")
+        request.state.user = payload
+        return payload
     except Exception:
         return None
 

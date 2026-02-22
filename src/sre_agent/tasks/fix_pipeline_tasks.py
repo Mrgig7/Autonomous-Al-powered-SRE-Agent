@@ -1,3 +1,5 @@
+import hashlib
+import json
 import logging
 from typing import Any
 from uuid import UUID
@@ -117,6 +119,32 @@ def run_fix_pipeline(self, run_id: str, correlation_id: str | None = None) -> di
     return result
 
 
+@celery_app.task(
+    bind=True,
+    base=BaseTask,
+    max_retries=3,
+    default_retry_delay=30,
+)
+def approve_run_and_create_pr(
+    self,
+    run_id: str,
+    approved_by: str,
+    correlation_id: str | None = None,
+) -> dict:
+    """Approve an awaiting run and create PR (plus conditional auto-merge)."""
+    import asyncio
+
+    from sre_agent.fix_pipeline.orchestrator import FixPipelineOrchestrator
+
+    orchestrator = FixPipelineOrchestrator()
+    return asyncio.run(
+        orchestrator.approve_and_create_pr(
+            UUID(run_id),
+            approved_by=approved_by,
+        )
+    )
+
+
 async def _run_fix_pipeline_guarded(run_id: UUID, correlation_id: str | None) -> dict:
     from datetime import UTC, datetime
 
@@ -127,7 +155,8 @@ async def _run_fix_pipeline_guarded(run_id: UUID, correlation_id: str | None) ->
     from sre_agent.database import get_async_session
     from sre_agent.fix_pipeline.store import FixPipelineRunStore
     from sre_agent.models.events import PipelineEvent
-    from sre_agent.observability.metrics import METRICS
+    from sre_agent.models.fix_pipeline import FixPipelineRunStatus
+    from sre_agent.observability.metrics import METRICS, record_retry_signature_blocked
     from sre_agent.ops.retry_policy import compute_backoff_seconds, is_retryable_exception
 
     store = FixPipelineRunStore()
@@ -158,10 +187,13 @@ async def _run_fix_pipeline_guarded(run_id: UUID, correlation_id: str | None) ->
     run_key_ctx.set(str(run_key))
 
     settings = get_settings()
+    redis_service = get_redis_service()
     max_attempts = int(getattr(settings, "max_pipeline_attempts", 3))
     cooldown_seconds = int(getattr(settings, "cooldown_seconds", 900))
     base_backoff = int(getattr(settings, "base_backoff_seconds", 30))
     max_backoff = int(getattr(settings, "max_backoff_seconds", 600))
+    retry_signature_ttl = int(getattr(settings, "retry_signature_ttl_seconds", 86400))
+    retry_limit = int(getattr(run, "retry_limit_snapshot", 3) or 3)
 
     if run.attempt_count >= max_attempts:
         await store.update_run(run_id, blocked_reason="max_attempts")
@@ -172,6 +204,38 @@ async def _run_fix_pipeline_guarded(run_id: UUID, correlation_id: str | None) ->
         METRICS.pipeline_runs_total.labels(outcome="blocked").inc()
         return {"success": False, "error": "blocked", "blocked_reason": "max_attempts"}
 
+    rca_json = getattr(run, "rca_json", None) or {}
+
+    signature_payload = {
+        "repo": repo,
+        "category": ((rca_json.get("classification") or {}).get("category")),
+        "hypothesis": ((rca_json.get("primary_hypothesis") or {}).get("description")),
+        "error": (event.error_message if event else None),
+        "adapter": getattr(run, "adapter_name", None),
+    }
+    signature_hash = hashlib.sha256(
+        json.dumps(signature_payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()[:24]
+    signature_key = f"retry_signature:{repo}:{signature_hash}"
+    signature_count = await redis_service.increment_counter(
+        key=signature_key,
+        ttl_seconds=retry_signature_ttl,
+    )
+    if signature_count > retry_limit:
+        await store.update_run(
+            run_id,
+            blocked_reason="retry_limit_exceeded",
+            status=FixPipelineRunStatus.ESCALATED.value,
+        )
+        record_retry_signature_blocked()
+        METRICS.pipeline_loop_blocked_total.labels(reason="retry_limit_exceeded").inc()
+        METRICS.pipeline_runs_total.labels(outcome="blocked").inc()
+        return {
+            "success": False,
+            "error": "blocked",
+            "blocked_reason": "retry_limit_exceeded",
+        }
+
     if run.attempt_count > 0:
         last = run.updated_at or run.created_at
         now = datetime.now(UTC)
@@ -180,7 +244,6 @@ async def _run_fix_pipeline_guarded(run_id: UUID, correlation_id: str | None) ->
             remaining = int(cooldown_seconds - elapsed)
             raise RetryablePipelineError(countdown_seconds=remaining, reason="cooldown")
 
-    redis_service = get_redis_service()
     repo_limit = int(getattr(settings, "repo_pipeline_concurrency_limit", 2))
     repo_ttl = int(getattr(settings, "repo_pipeline_concurrency_ttl_seconds", 1200))
 

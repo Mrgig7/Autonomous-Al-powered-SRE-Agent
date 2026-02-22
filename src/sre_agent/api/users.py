@@ -22,7 +22,7 @@ from sre_agent.auth.permissions import (
     require_permission,
 )
 from sre_agent.auth.rbac import Permission, UserRole
-from sre_agent.database import get_async_session
+from sre_agent.database import get_db_session
 from sre_agent.services.user_service import UserService
 
 logger = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ def user_to_response(user) -> UserResponse:
 async def create_user(
     request: CreateUserRequest,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Create a new user (admin only)."""
     service = UserService(session)
@@ -156,7 +156,7 @@ async def list_users(
     active_only: bool = True,
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserListResponse:
     """List users with filtering and pagination."""
     service = UserService(session)
@@ -184,7 +184,7 @@ async def list_users(
     dependencies=[Depends(require_permission(Permission.VIEW_USERS))],
 )
 async def get_user_stats(
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserStatsResponse:
     """Get user statistics (counts by role, etc.)."""
     service = UserService(session)
@@ -200,7 +200,7 @@ async def get_user_stats(
 )
 async def get_user(
     user_id: UUID,
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Get a user by their ID."""
     service = UserService(session)
@@ -225,7 +225,7 @@ async def update_user(
     user_id: UUID,
     request: UpdateUserRequest,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Update a user's profile."""
     service = UserService(session)
@@ -264,7 +264,7 @@ async def change_user_role(
     user_id: UUID,
     request: ChangeRoleRequest,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Change a user's role (admin only)."""
     # Prevent self-demotion for super_admins
@@ -307,7 +307,7 @@ async def change_user_role(
 async def deactivate_user(
     user_id: UUID,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Deactivate a user account."""
     if user_id == current_user.user_id:
@@ -340,7 +340,7 @@ async def deactivate_user(
 async def reactivate_user(
     user_id: UUID,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Reactivate a deactivated user account."""
     service = UserService(session)
@@ -368,7 +368,7 @@ async def delete_user(
     user_id: UUID,
     hard_delete: bool = False,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> None:
     """Delete a user (super admin only)."""
     if user_id == current_user.user_id:
@@ -403,7 +403,7 @@ async def delete_user(
 )
 async def get_my_profile(
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Get the current user's profile."""
     service = UserService(session)
@@ -426,7 +426,7 @@ async def get_my_profile(
 async def update_my_profile(
     request: UpdateUserRequest,
     current_user: TokenPayload = Depends(get_current_user),
-    session=Depends(get_async_session),
+    session=Depends(get_db_session),
 ) -> UserResponse:
     """Update the current user's profile."""
     service = UserService(session)

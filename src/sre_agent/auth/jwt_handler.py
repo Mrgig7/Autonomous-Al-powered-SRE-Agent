@@ -9,7 +9,7 @@ This module provides production-grade JWT token management with:
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Optional
 from uuid import UUID, uuid4
 
@@ -105,7 +105,7 @@ class JWTHandler:
         Returns:
             Encoded JWT access token
         """
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         expire = now + timedelta(minutes=self.access_token_expire_minutes)
 
         payload = {
@@ -138,7 +138,7 @@ class JWTHandler:
         Returns:
             Encoded JWT refresh token
         """
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         expire = now + timedelta(days=self.refresh_token_expire_days)
 
         payload = {

@@ -1,6 +1,6 @@
 """Schemas for knowledge and learning store."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID
 
@@ -74,7 +74,7 @@ class IncidentRecord(BaseModel):
     resolved_by: str | None = Field(None, description="Auto or manual")
 
     # Timestamps
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     resolved_at: datetime | None = None
 
     # Embedding (for storage reference)

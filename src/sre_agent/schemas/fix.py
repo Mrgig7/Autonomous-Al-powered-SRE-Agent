@@ -1,6 +1,6 @@
 """Schemas for AI-generated fix suggestions."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import UUID
 
@@ -119,7 +119,7 @@ class FixSuggestion(BaseModel):
 
     # Timestamps
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
         description="When the fix was generated",
     )
 

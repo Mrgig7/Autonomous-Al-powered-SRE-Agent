@@ -4,7 +4,7 @@ These schemas represent the aggregated observability data
 that will be used by the Failure Intelligence Layer for RCA.
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Literal
 from uuid import UUID
@@ -187,7 +187,7 @@ class FailureContextBundle(BaseModel):
 
     # Metadata
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
         description="When this bundle was created",
     )
     context_version: str = Field("1.0", description="Schema version")

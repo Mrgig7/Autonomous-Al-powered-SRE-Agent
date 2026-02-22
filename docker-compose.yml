@@ -64,6 +64,10 @@ services:
       # GitHub Integration
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET:-}
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID:-}
+      - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET:-}
+      - GITHUB_OAUTH_REDIRECT_URI=${GITHUB_OAUTH_REDIRECT_URI:-http://localhost:3000/oauth/github/callback}
+      - GITHUB_OAUTH_REQUIRED_SCOPES=${GITHUB_OAUTH_REQUIRED_SCOPES:-repo,read:user,user:email,workflow}
       # LLM Configuration
       - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
@@ -88,7 +92,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: sre-agent-worker
-    command: celery -A sre_agent.tasks.celery_app worker --loglevel=info
+    command: celery -A sre_agent.celery_app worker --loglevel=info
     environment:
       - DATABASE_URL=postgresql+asyncpg://sre_agent:sre_agent_password@postgres:5432/sre_agent
       - REDIS_URL=redis://redis:6379/0
