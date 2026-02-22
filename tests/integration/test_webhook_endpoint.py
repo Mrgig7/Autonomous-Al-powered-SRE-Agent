@@ -83,12 +83,20 @@ class TestGitHubWebhookEndpoint:
         data = response.json()
         assert data["status"] == "ignored"
 
+    @patch(
+        "sre_agent.api.webhooks.github.PostMergeMonitorService",
+    )
     def test_successful_job_returns_ignored(
         self,
+        mock_monitor_class: Any,
         client: TestClient,
         sample_github_workflow_job_success_payload: dict[str, Any],
     ) -> None:
         """Successful job should be ignored."""
+        from unittest.mock import AsyncMock
+
+        mock_monitor_class.return_value.process_outcome = AsyncMock(return_value=None)
+
         response = client.post(
             "/webhooks/github",
             content=json.dumps(sample_github_workflow_job_success_payload).encode(),
